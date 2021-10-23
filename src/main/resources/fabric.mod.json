@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "sculkhunt",
+  "version": "${version}",
+  "name": "Sculkhunt",
+  "description": "!!DESCRIPTION",
+  "authors": [
+    "doctor4t"
+  ],
+  "contact": {
+    "sources": "https://github.com/Ladysnake/sculkhunt",
+    "issues": "https://github.com/Ladysnake/sculkhunt/issues"
+  },
+  "license": "Code: GNU GPLv3; Art: ARR",
+  "icon": "assets/sculkhunt/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "ladysnake.sculkhunt.common.Sculkhunt"
+    ],
+    "client": [
+      "ladysnake.sculkhunt.client.SculkhuntClient"
+    ],
+    "cardinal-components": [
+      "ladysnake.sculkhunt.cca.SculkhuntComponents"
+    ]
+  },
+  "mixins": [
+    "sculkhunt.mixins.json"
+  ],
+  "accessWidener": "sculkhunt.accesswidener",
+  "custom": {
+    "cardinal-components": [
+      "sculkhunt:sculk"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.11.3",
+    "fabric": "*",
+    "minecraft": "1.17.x",
+    "java": ">=16"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}

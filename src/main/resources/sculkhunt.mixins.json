@@ -1,0 +1,28 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "ladysnake.sculkhunt.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "client": [
+    "client.LivingEntityRendererMixin",
+    "client.PlayerEntityRendererMixin",
+    "client.RenderLayerAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
+    "HostileEntityMixin",
+    "HungerManagerMixin",
+    "LivingEntityMixin",
+    "LivingEntitySoundAccessor",
+    "MobEntitySoundAccessor",
+    "ProjectileEntityMixin",
+    "SculkFollowTargetGoalMixin",
+    "SculkSensorBlockDetectionMixin",
+    "SculkSensorListenerMixin",
+    "ServerPlayerEntityMixin",
+    "SoundEntityMixin",
+    "PlayerEntityMixin"
+  ]
+}
