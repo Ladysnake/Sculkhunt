@@ -1,6 +1,7 @@
 package ladysnake.sculkhunt.common.entity;
 
 import com.google.common.collect.Lists;
+import ladysnake.sculkhunt.cca.SculkhuntComponents;
 import ladysnake.sculkhunt.common.block.SculkVeinBlock;
 import ladysnake.sculkhunt.common.init.SculkhuntBlocks;
 import ladysnake.sculkhunt.common.init.SculkhuntGamerules;
@@ -14,6 +15,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -23,16 +25,19 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static ladysnake.sculkhunt.common.Sculkhunt.SPAWN_RADIUS;
 
 public class SculkCatalystEntity extends Entity {
     private static final TrackedData<Integer> BLOOMING_PHASE = DataTracker.registerData(SculkCatalystEntity.class, TrackedDataHandlerRegistry.INTEGER);
@@ -44,7 +49,7 @@ public class SculkCatalystEntity extends Entity {
     }
 
     public boolean canPlaceSculkAt(BlockPos blockPos) {
-        return (world.getBlockState(blockPos.add(0, 1, 0)).getBlock() == SculkhuntBlocks.SCULK_VEIN || world.getBlockState(blockPos.add(0, 1, 0)).isAir() || world.getBlockState(blockPos.add(0, 1, 0)).getMaterial() == Material.BAMBOO || world.getBlockState(blockPos.add(0, 1, 0)).getMaterial() == Material.BAMBOO_SAPLING || world.getBlockState(blockPos.add(0, 1, 0)).getMaterial() == Material.COBWEB || world.getBlockState(blockPos.add(0, 1, 0)).getMaterial() == Material.FIRE || world.getBlockState(blockPos.add(0, 1, 0)).getMaterial() == Material.CARPET || world.getBlockState(blockPos.add(0, 1, 0)).getMaterial() == Material.CACTUS || world.getBlockState(blockPos.add(0, 1, 0)).getMaterial() == Material.PLANT || world.getBlockState(blockPos.add(0, 1, 0)).getMaterial() == Material.REPLACEABLE_PLANT || world.getBlockState(blockPos.add(0, 1, 0)).getMaterial() == Material.SNOW_LAYER || world.getBlockState(blockPos.add(0, 1, 0)).getMaterial() == Material.POWDER_SNOW || world.getBlockState(blockPos.add(0, 1, 0)).getBlock() == Blocks.WATER)
+        return (world.getBlockState(blockPos.add(0, 1, 0)).getBlock() == SculkhuntBlocks.SCULK_VEIN || world.getBlockState(blockPos.add(0, 1, 0)).isAir() || world.getBlockState(blockPos.add(0, 1, 0)).getMaterial() == Material.BAMBOO || world.getBlockState(blockPos.add(0, 1, 0)).getMaterial() == Material.BAMBOO_SAPLING || world.getBlockState(blockPos.add(0, 1, 0)).getMaterial() == Material.COBWEB || world.getBlockState(blockPos.add(0, 1, 0)).getMaterial() == Material.FIRE || world.getBlockState(blockPos.add(0, 1, 0)).getMaterial() == Material.CARPET || world.getBlockState(blockPos.add(0, 1, 0)).getMaterial() == Material.CACTUS || world.getBlockState(blockPos.add(0, 1, 0)).getMaterial() == Material.PLANT || world.getBlockState(blockPos.add(0, 1, 0)).getMaterial() == Material.REPLACEABLE_PLANT || world.getBlockState(blockPos.add(0, 1, 0)).getMaterial() == Material.SNOW_LAYER  || world.getBlockState(blockPos.add(0, 1, 0)).getBlock() == Blocks.WATER)
                 && world.getBlockState(blockPos).isSolidBlock(world, blockPos)
                 && blockPos != this.getBlockPos()
                 && this.random.nextInt(5) == 0
@@ -52,7 +57,7 @@ public class SculkCatalystEntity extends Entity {
     }
 
     public boolean canPlaceVeinAt(BlockPos blockPos) {
-        return (world.getBlockState(blockPos).isAir() || world.getBlockState(blockPos).getMaterial() == Material.BAMBOO || world.getBlockState(blockPos).getMaterial() == Material.BAMBOO_SAPLING || world.getBlockState(blockPos).getMaterial() == Material.COBWEB || world.getBlockState(blockPos).getMaterial() == Material.FIRE || world.getBlockState(blockPos).getMaterial() == Material.CARPET || world.getBlockState(blockPos).getMaterial() == Material.CACTUS || world.getBlockState(blockPos).getMaterial() == Material.PLANT || world.getBlockState(blockPos).getMaterial() == Material.REPLACEABLE_PLANT || world.getBlockState(blockPos).getMaterial() == Material.UNDERWATER_PLANT || world.getBlockState(blockPos).getMaterial() == Material.REPLACEABLE_UNDERWATER_PLANT || world.getBlockState(blockPos.add(0, 1, 0)).getMaterial() == Material.SNOW_LAYER || world.getBlockState(blockPos.add(0, 1, 0)).getMaterial() == Material.POWDER_SNOW || world.getBlockState(blockPos).getBlock() == Blocks.WATER)
+        return (world.getBlockState(blockPos).isAir() || world.getBlockState(blockPos).getMaterial() == Material.BAMBOO || world.getBlockState(blockPos).getMaterial() == Material.BAMBOO_SAPLING || world.getBlockState(blockPos).getMaterial() == Material.COBWEB || world.getBlockState(blockPos).getMaterial() == Material.FIRE || world.getBlockState(blockPos).getMaterial() == Material.CARPET || world.getBlockState(blockPos).getMaterial() == Material.CACTUS || world.getBlockState(blockPos).getMaterial() == Material.PLANT || world.getBlockState(blockPos).getMaterial() == Material.REPLACEABLE_PLANT || world.getBlockState(blockPos).getMaterial() == Material.UNDERWATER_PLANT || world.getBlockState(blockPos).getMaterial() == Material.REPLACEABLE_UNDERWATER_PLANT || world.getBlockState(blockPos.add(0, 1, 0)).getMaterial() == Material.SNOW_LAYER || world.getBlockState(blockPos).getBlock() == Blocks.WATER)
                 && (world.getBlockState(blockPos.add(0, -1, 0)).isSolidBlock(world, blockPos))
                 && blockPos != this.getBlockPos()
                 && world.getBlockState(blockPos.add(0, -1, 0)).getMaterial() != Material.SCULK;
@@ -146,6 +151,28 @@ public class SculkCatalystEntity extends Entity {
                                     }
                                 }
                             }
+                        } else if (world.getBlockState(blockPos).getBlock() == SculkhuntBlocks.SCULK) {
+                            if (this.random.nextInt(world.getGameRules().get(SculkhuntGamerules.SCULK_CATALYST_MOB_SPAWN_FREQUENCY).get()) == 0) {
+                                Entity entity;
+                                switch (random.nextInt(4)) {
+                                    case 0:
+                                        entity = EntityType.CREEPER.create(world);
+                                        break;
+                                    case 1:
+                                        entity = EntityType.SPIDER.create(world);
+                                        break;
+                                    case 2:
+                                        entity = EntityType.SKELETON.create(world);
+                                        break;
+                                    default:
+                                        entity = EntityType.ZOMBIE.create(world);
+                                }
+
+                                entity.setPos(blockPos.getX(), blockPos.getY() - entity.getHeight(), blockPos.getZ());
+                                entity.updateTrackedPosition(blockPos.getX(), blockPos.getY() - entity.getHeight(), blockPos.getZ());
+                                SculkhuntComponents.SCULK.get(entity).setSculk(true);
+                                this.world.spawnEntity(entity);
+                            }
                         }
                     }
                 }
@@ -164,6 +191,41 @@ public class SculkCatalystEntity extends Entity {
                 this.setBloomingPhase(this.getBloomingPhase() + 1);
             }
         }
+    }
+
+    @Override
+    public ActionResult interact(PlayerEntity player, Hand hand) {
+        if (SculkhuntComponents.SCULK.get(player).isSculk()) {
+            if (!this.world.isClient) {
+                // respawn in sculk
+                ServerWorld world = (ServerWorld) player.world;
+
+                List<ServerPlayerEntity> players = world.getPlayers(serverPlayerEntity -> !serverPlayerEntity.isCreative() && !serverPlayerEntity.isSpectator() && !SculkhuntComponents.SCULK.get(serverPlayerEntity).isSculk());
+                List<SculkCatalystEntity> catalysts;
+
+                if (!players.isEmpty()) {
+                    ServerPlayerEntity prey = players.get(world.random.nextInt(players.size()));
+                    catalysts = world.getEntitiesByClass(SculkCatalystEntity.class, new Box(prey.getX() - SPAWN_RADIUS, prey.getY() - SPAWN_RADIUS / 2f, prey.getZ() - SPAWN_RADIUS, prey.getX() + SPAWN_RADIUS, prey.getY() + SPAWN_RADIUS / 2f, prey.getZ() + SPAWN_RADIUS), sculkCatalystEntity -> true);
+
+                    if (!catalysts.isEmpty()) {
+                        catalysts.sort((o1, o2) -> (int) (prey.getPos().distanceTo(o1.getPos()) - prey.getPos().distanceTo(o2.getPos())));
+                        Vec3d newPos = catalysts.get(0).getPos().add(world.random.nextGaussian() * 5, -player.getHeight() * 2, world.random.nextGaussian() * 5);
+
+                        ((ServerPlayerEntity) player).networkHandler.requestTeleport(newPos.getX(), newPos.getY(), newPos.getZ(), player.getYaw(), player.getPitch());
+                    }
+                } else {
+                    catalysts = world.getEntitiesByClass(SculkCatalystEntity.class, new Box(player.getX() - SPAWN_RADIUS * 5f, player.getY() - SPAWN_RADIUS * 5f / 2f, player.getZ() - SPAWN_RADIUS * 5f, player.getX() + SPAWN_RADIUS * 5f, player.getY() + SPAWN_RADIUS * 5f / 2f, player.getZ() + SPAWN_RADIUS * 5f), sculkCatalystEntity -> true);
+
+                    if (!catalysts.isEmpty()) {
+                        Vec3d newPos = catalysts.get(world.random.nextInt(catalysts.size())).getPos().add(world.random.nextGaussian() * 5, -player.getHeight() * 2, world.random.nextGaussian() * 5);
+
+                        ((ServerPlayerEntity) player).networkHandler.requestTeleport(newPos.getX(), newPos.getY(), newPos.getZ(), player.getYaw(), player.getPitch());
+                    }
+                }
+            }
+        }
+
+        return super.interact(player, hand);
     }
 
     @Override
@@ -248,7 +310,7 @@ public class SculkCatalystEntity extends Entity {
 
     public boolean damage(DamageSource source, float amount) {
         if (!this.isRemoved() && !this.world.isClient) {
-            int amountOfSculkToRemove = Math.round(amount * 8);
+            int amountOfSculkToRemove = Math.round(amount * amount);
             List<Sculk> newSculk = new ArrayList<>();
 
             if ((amountOfSculkToRemove >= this.sculks.size() || this.sculks.isEmpty())) {

@@ -40,13 +40,13 @@ public class SculkBlock extends OreBlock {
                     entity.damage(SculkhuntDamageSources.SCULK, 2.5f);
                 }
 
-                ((LivingEntity) entity).addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 20, 2, false, false, false));
+                ((LivingEntity) entity).addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 20, 1, false, false, false));
                 if (((LivingEntity) entity).getEquippedStack(EquipmentSlot.FEET).isEmpty()) {
-                    ((LivingEntity) entity).addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 20, 2, false, false, false));
+                    ((LivingEntity) entity).addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 20, 1, false, false, false));
                 }
             } else {
                 if (!((LivingEntity) entity).hasStatusEffect(StatusEffects.REGENERATION)) {
-                    ((LivingEntity) entity).addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 60, 2, false, false, false));
+                    ((LivingEntity) entity).addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 60, 1, false, false, false));
                 }
                 ((LivingEntity) entity).addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 20, 1, false, false, false));
             }
@@ -58,6 +58,16 @@ public class SculkBlock extends OreBlock {
             if (world.random.nextInt(50) == 0) {
                 entity.kill();
             }
+        }
+    }
+
+    @Override
+    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        super.onBreak(world, pos, state, player);
+
+        if (SculkhuntComponents.SCULK.get(player).isSculk()) {
+            world.setBlockState(pos.add(0, -1, 0), SculkhuntBlocks.SCULK_VEIN.getDefaultState());
+            player.getInventory().insertStack(new ItemStack(SculkhuntBlocks.SCULK, 1));
         }
     }
 }

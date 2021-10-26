@@ -15,6 +15,7 @@ import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -71,5 +72,22 @@ public abstract class PlayerEntityRendererMixin extends LivingEntityRenderer<Abs
             }
         }
         return true;
+    }
+
+    // no name for sculk players
+    @Inject(method = "renderLabelIfPresent", at = @At("HEAD"), cancellable = true)
+    protected void renderLabelIfPresent(AbstractClientPlayerEntity abstractClientPlayerEntity, Text text, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo callbackInfo) {
+        if (SculkhuntComponents.SCULK.get(abstractClientPlayerEntity).isSculk()) {
+            callbackInfo.cancel();
+        }
+    }
+
+    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
+    public void render(AbstractClientPlayerEntity abstractClientPlayerEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo callbackInfo) {
+        if (SculkhuntComponents.SCULK.get(MinecraftClient.getInstance().player).isSculk() && !SculkhuntComponents.SCULK.get(abstractClientPlayerEntity).isSculk()) {
+            if ((!SculkhuntComponents.SCULK.get(abstractClientPlayerEntity).isDetected() && (abstractClientPlayerEntity.getX() == abstractClientPlayerEntity.prevX && abstractClientPlayerEntity.getZ() == abstractClientPlayerEntity.prevZ)) || abstractClientPlayerEntity.isSneaking()) {
+                callbackInfo.cancel();
+            }
+        }
     }
 }

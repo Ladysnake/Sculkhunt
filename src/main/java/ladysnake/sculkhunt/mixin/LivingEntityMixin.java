@@ -10,6 +10,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
@@ -63,7 +64,7 @@ public abstract class LivingEntityMixin extends Entity {
         }
     }
 
-    @Inject(method = "tick", at = @At("RETURN"))
+    @Inject(method = "tick", at = @At("HEAD"))
     public void tick(CallbackInfo callbackInfo) {
         if (SculkhuntComponents.SCULK.get(this).isDetected()) {
             SculkhuntComponents.SCULK.get(this).decrementDetectedTime();
@@ -71,21 +72,17 @@ public abstract class LivingEntityMixin extends Entity {
 
         if (SculkhuntComponents.SCULK.get(this).isSculk()) {
             // rise from sculk
-            if (world.getBlockState(this.getBlockPos()).isSolidBlock(world, this.getBlockPos())) {
-                if (this.isInsideWall()) {
-                    this.requestTeleport(this.getX(), this.getY() + 1, this.getZ());
+            if (!((Object) this instanceof PlayerEntity && ((((PlayerEntity) (Object) this).isCreative()) || ((PlayerEntity) (Object) this).isSpectator()))) {
+                if (world.getBlockState(this.getBlockPos()).isSolidBlock(world, this.getBlockPos())) {
+                    noClip = ((Object) this instanceof PlayerEntity) && world.getBlockState(this.getBlockPos()).isSolidBlock(world, this.getBlockPos());
+                    setVelocity(0, world.getBlockState(getBlockPos().up()).isSolidBlock(world, getBlockPos().up()) ? 1 : 0.05, 0);
+                    velocityModified = true;
+                    velocityDirty = true;
+                    for (int i = 0; i < (this.getWidth() * this.getHeight()) * 25; i++) {
+                        world.addParticle(new ItemStackParticleEffect(ParticleTypes.ITEM, new ItemStack(SculkhuntBlocks.SCULK)), this.getX() + random.nextGaussian() * this.getWidth() / 5f, this.getY() + random.nextGaussian() * this.getHeight() / 5f, this.getZ() + random.nextGaussian() * this.getWidth() / 5f, random.nextGaussian() / 10f, random.nextFloat() / 5f, random.nextGaussian() / 10f);
+                    }
+                    this.playSound(SoundEvents.BLOCK_SCULK_SENSOR_STEP, 1.0f, 0.9f);
                 }
-
-                if (!world.isClient) {
-                    this.setVelocity(0, 0.05, 0);
-                    this.velocityModified = true;
-                    this.velocityDirty = true;
-                }
-                this.fallDistance = 0f;
-                for (int i = 0; i < (this.getWidth() * this.getHeight()) * 25; i++) {
-                    world.addParticle(new ItemStackParticleEffect(ParticleTypes.ITEM, new ItemStack(SculkhuntBlocks.SCULK)), this.getX() + random.nextGaussian() * this.getWidth() / 5f, this.getY() + random.nextGaussian() * this.getHeight() / 5f, this.getZ() + random.nextGaussian() * this.getWidth() / 5f, random.nextGaussian() / 10f, random.nextFloat() / 5f, random.nextGaussian() / 10f);
-                }
-                this.playSound(SoundEvents.BLOCK_SCULK_SENSOR_STEP, 1.0f, 0.9f);
             }
         }
 
@@ -119,4 +116,5 @@ public abstract class LivingEntityMixin extends Entity {
             callbackInfoReturnable.setReturnValue(false);
         }
     }
+
 }
