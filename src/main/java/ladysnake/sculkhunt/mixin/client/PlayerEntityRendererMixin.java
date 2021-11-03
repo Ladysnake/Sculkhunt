@@ -81,13 +81,4 @@ public abstract class PlayerEntityRendererMixin extends LivingEntityRenderer<Abs
             callbackInfo.cancel();
         }
     }
-
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void render(AbstractClientPlayerEntity abstractClientPlayerEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo callbackInfo) {
-        if (SculkhuntComponents.SCULK.get(MinecraftClient.getInstance().player).isSculk() && !SculkhuntComponents.SCULK.get(abstractClientPlayerEntity).isSculk()) {
-            if ((!SculkhuntComponents.SCULK.get(abstractClientPlayerEntity).isDetected() && (abstractClientPlayerEntity.getX() == abstractClientPlayerEntity.prevX && abstractClientPlayerEntity.getZ() == abstractClientPlayerEntity.prevZ)) || abstractClientPlayerEntity.isSneaking()) {
-                callbackInfo.cancel();
-            }
-        }
-    }
 }

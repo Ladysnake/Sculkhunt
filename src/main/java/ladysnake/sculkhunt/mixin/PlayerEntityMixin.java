@@ -50,7 +50,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
         // particles for people who hide too well
         if (!SculkhuntComponents.SCULK.get(this).isSculk()) {
-            if (this.age % 1200 == 0) {
+            if (this.age % 600 == 0) {
                 this.world.addParticle(Sculkhunt.SOUND, true, this.getX(), this.getY() + this.getHeight() / 2, this.getZ(), 0, 0, 0);
             }
         }

@@ -2,16 +2,16 @@ package ladysnake.sculkhunt.mixin;
 
 import com.google.common.collect.ImmutableList;
 import ladysnake.sculkhunt.cca.SculkhuntComponents;
+import ladysnake.sculkhunt.common.Sculkhunt;
 import ladysnake.sculkhunt.common.init.SculkhuntBlocks;
 import ladysnake.sculkhunt.common.init.SculkhuntDamageSources;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityPose;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.*;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundEvents;
@@ -72,7 +72,7 @@ public abstract class LivingEntityMixin extends Entity {
 
         if (SculkhuntComponents.SCULK.get(this).isSculk()) {
             // rise from sculk
-            if (!((Object) this instanceof PlayerEntity && ((((PlayerEntity) (Object) this).isCreative()) || ((PlayerEntity) (Object) this).isSpectator()))) {
+            if (!((Object) this instanceof PlayerEntity && ((PlayerEntity) (Object) this).isSpectator())) {
                 if (world.getBlockState(this.getBlockPos()).isSolidBlock(world, this.getBlockPos())) {
                     noClip = ((Object) this instanceof PlayerEntity) && world.getBlockState(this.getBlockPos()).isSolidBlock(world, this.getBlockPos());
                     setVelocity(0, world.getBlockState(getBlockPos().up()).isSolidBlock(world, getBlockPos().up()) ? 1 : 0.05, 0);
@@ -92,6 +92,13 @@ public abstract class LivingEntityMixin extends Entity {
     protected void updatePostDeath(CallbackInfo callbackInfo) {
         if (SculkhuntComponents.SCULK.get(this).isSculk()) {
             this.setInvisible(true);
+
+            if (this.deathTime == 1) {
+                ItemEntity droppedItem = new ItemEntity(world, this.getX(), this.getY(), this.getZ(), new ItemStack(Sculkhunt.SCULK_DROPS[random.nextInt(Sculkhunt.SCULK_DROPS.length)], 1+random.nextInt(3)));
+                droppedItem.setVelocity(random.nextGaussian()/5f, random.nextGaussian()/5f, random.nextGaussian()/5f);
+                world.spawnEntity(droppedItem);
+            }
+
             for (int i = 0; i < (this.getWidth() * this.getHeight()) * 100; i++) {
                 world.addParticle(new ItemStackParticleEffect(ParticleTypes.ITEM, new ItemStack(SculkhuntBlocks.SCULK)), this.getX() + random.nextGaussian() * this.getWidth() / 2f, (this.getY() + this.getHeight() / 2f) + random.nextGaussian() * this.getHeight() / 2f, this.getZ() + random.nextGaussian() * this.getWidth() / 2f, random.nextGaussian() / 10f, random.nextFloat() / 10f, random.nextGaussian() / 10f);
             }
@@ -117,4 +124,17 @@ public abstract class LivingEntityMixin extends Entity {
         }
     }
 
+    @Inject(method = "canBreatheInWater", at = @At("RETURN"), cancellable = true)
+    protected void canBreatheInWater(CallbackInfoReturnable<Boolean> callbackInfoReturnable) {
+        if (SculkhuntComponents.SCULK.get(this).isSculk()) {
+            callbackInfoReturnable.setReturnValue(true);
+        }
+    }
+
+    @Inject(method = "damage", at = @At("TAIL"))
+    public void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> callbackInfoReturnable) {
+        if (source.equals(DamageSource.ON_FIRE)) {
+            this.timeUntilRegen = 10;
+        }
+    }
 }

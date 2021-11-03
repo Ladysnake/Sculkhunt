@@ -2,6 +2,7 @@ package ladysnake.sculkhunt.common.entity;
 
 import com.google.common.collect.Lists;
 import ladysnake.sculkhunt.cca.SculkhuntComponents;
+import ladysnake.sculkhunt.common.Sculkhunt;
 import ladysnake.sculkhunt.common.block.SculkVeinBlock;
 import ladysnake.sculkhunt.common.init.SculkhuntBlocks;
 import ladysnake.sculkhunt.common.init.SculkhuntGamerules;
@@ -11,6 +12,7 @@ import net.minecraft.block.ConnectingBlock;
 import net.minecraft.block.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -57,7 +59,7 @@ public class SculkCatalystEntity extends Entity {
     }
 
     public boolean canPlaceVeinAt(BlockPos blockPos) {
-        return (world.getBlockState(blockPos).isAir() || world.getBlockState(blockPos).getMaterial() == Material.BAMBOO || world.getBlockState(blockPos).getMaterial() == Material.BAMBOO_SAPLING || world.getBlockState(blockPos).getMaterial() == Material.COBWEB || world.getBlockState(blockPos).getMaterial() == Material.FIRE || world.getBlockState(blockPos).getMaterial() == Material.CARPET || world.getBlockState(blockPos).getMaterial() == Material.CACTUS || world.getBlockState(blockPos).getMaterial() == Material.PLANT || world.getBlockState(blockPos).getMaterial() == Material.REPLACEABLE_PLANT || world.getBlockState(blockPos).getMaterial() == Material.UNDERWATER_PLANT || world.getBlockState(blockPos).getMaterial() == Material.REPLACEABLE_UNDERWATER_PLANT || world.getBlockState(blockPos.add(0, 1, 0)).getMaterial() == Material.SNOW_LAYER || world.getBlockState(blockPos).getBlock() == Blocks.WATER)
+        return (world.getBlockState(blockPos).isAir() || world.getBlockState(blockPos).getMaterial() == Material.BAMBOO || world.getBlockState(blockPos).getMaterial() == Material.BAMBOO_SAPLING || world.getBlockState(blockPos).getMaterial() == Material.COBWEB || world.getBlockState(blockPos).getMaterial() == Material.FIRE || world.getBlockState(blockPos).getMaterial() == Material.CARPET || world.getBlockState(blockPos).getMaterial() == Material.CACTUS || world.getBlockState(blockPos).getMaterial() == Material.PLANT || world.getBlockState(blockPos).getMaterial() == Material.REPLACEABLE_PLANT || world.getBlockState(blockPos).getMaterial() == Material.REPLACEABLE_UNDERWATER_PLANT || world.getBlockState(blockPos.add(0, 1, 0)).getMaterial() == Material.SNOW_LAYER || world.getBlockState(blockPos).getBlock() == Blocks.WATER)
                 && (world.getBlockState(blockPos.add(0, -1, 0)).isSolidBlock(world, blockPos))
                 && blockPos != this.getBlockPos()
                 && world.getBlockState(blockPos.add(0, -1, 0)).getMaterial() != Material.SCULK;
@@ -196,6 +198,11 @@ public class SculkCatalystEntity extends Entity {
     @Override
     public ActionResult interact(PlayerEntity player, Hand hand) {
         if (SculkhuntComponents.SCULK.get(player).isSculk()) {
+            for (int i = 0; i < (player.getWidth() * player.getHeight()) * 100; i++) {
+                world.addParticle(new ItemStackParticleEffect(ParticleTypes.ITEM, new ItemStack(SculkhuntBlocks.SCULK)), player.getX() + player.getRandom().nextGaussian() * player.getWidth() / 2f, (player.getY() + player.getHeight() / 2f) + player.getRandom().nextGaussian() * player.getHeight() / 2f, player.getZ() + player.getRandom().nextGaussian() * player.getWidth() / 2f, player.getRandom().nextGaussian() / 10f, player.getRandom().nextFloat() / 10f, player.getRandom().nextGaussian() / 10f);
+            }
+            player.playSound(SoundEvents.BLOCK_SCULK_SENSOR_BREAK, 1.0f, 0.9f);
+
             if (!this.world.isClient) {
                 // respawn in sculk
                 ServerWorld world = (ServerWorld) player.world;
@@ -209,7 +216,7 @@ public class SculkCatalystEntity extends Entity {
 
                     if (!catalysts.isEmpty()) {
                         catalysts.sort((o1, o2) -> (int) (prey.getPos().distanceTo(o1.getPos()) - prey.getPos().distanceTo(o2.getPos())));
-                        Vec3d newPos = catalysts.get(0).getPos().add(world.random.nextGaussian() * 5, -player.getHeight() * 2, world.random.nextGaussian() * 5);
+                        Vec3d newPos = catalysts.get(0).getPos().add(world.random.nextGaussian() * 2, -player.getHeight() * 2, world.random.nextGaussian() * 2);
 
                         ((ServerPlayerEntity) player).networkHandler.requestTeleport(newPos.getX(), newPos.getY(), newPos.getZ(), player.getYaw(), player.getPitch());
                     }
@@ -217,7 +224,7 @@ public class SculkCatalystEntity extends Entity {
                     catalysts = world.getEntitiesByClass(SculkCatalystEntity.class, new Box(player.getX() - SPAWN_RADIUS * 5f, player.getY() - SPAWN_RADIUS * 5f / 2f, player.getZ() - SPAWN_RADIUS * 5f, player.getX() + SPAWN_RADIUS * 5f, player.getY() + SPAWN_RADIUS * 5f / 2f, player.getZ() + SPAWN_RADIUS * 5f), sculkCatalystEntity -> true);
 
                     if (!catalysts.isEmpty()) {
-                        Vec3d newPos = catalysts.get(world.random.nextInt(catalysts.size())).getPos().add(world.random.nextGaussian() * 5, -player.getHeight() * 2, world.random.nextGaussian() * 5);
+                        Vec3d newPos = catalysts.get(world.random.nextInt(catalysts.size())).getPos().add(world.random.nextGaussian() * 2, -player.getHeight() * 2, world.random.nextGaussian() * 2);
 
                         ((ServerPlayerEntity) player).networkHandler.requestTeleport(newPos.getX(), newPos.getY(), newPos.getZ(), player.getYaw(), player.getPitch());
                     }
@@ -359,6 +366,10 @@ public class SculkCatalystEntity extends Entity {
 
             ((ServerWorld) world).spawnParticles(new ItemStackParticleEffect(ParticleTypes.ITEM, new ItemStack(SculkhuntBlocks.SCULK_CATALYST)), this.getBlockPos().getX() + 0.5, this.getBlockPos().getY() + 0.5, this.getBlockPos().getZ() + 0.5, 100, random.nextGaussian() / 5f, random.nextGaussian() / 5f, random.nextGaussian() / 5f, 0.15);
             ((ServerWorld) world).playSoundFromEntity(null, this, SoundEvents.BLOCK_SCULK_SENSOR_BREAK, SoundCategory.BLOCKS, 1.0f, 1.0f);
+
+            ItemEntity droppedItem = new ItemEntity(world, this.getX(), this.getY(), this.getZ(), new ItemStack(Sculkhunt.SCULK_DROPS[random.nextInt(Sculkhunt.SCULK_DROPS.length)], 1+random.nextInt(3)));
+            droppedItem.setVelocity(random.nextGaussian()/5f, random.nextGaussian()/5f, random.nextGaussian()/5f);
+            world.spawnEntity(droppedItem);
 
             super.kill();
         }

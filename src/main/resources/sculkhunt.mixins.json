@@ -6,12 +6,14 @@
   "client": [
     "client.LivingEntityRendererMixin",
     "client.PlayerEntityRendererMixin",
-    "client.RenderLayerAccessor"
+    "client.RenderLayerAccessor",
+    "client.EntityRenderDispatcherMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "mixins": [
+    "EntityMixin",
     "HostileEntityMixin",
     "HungerManagerMixin",
     "ItemEntityMixin",

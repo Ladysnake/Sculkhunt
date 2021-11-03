@@ -1,0 +1,13 @@
+{
+  "targets": [
+    "swap"
+  ],
+  "passes": [
+    {
+      "name": "sculkhunt:sculk",
+      "intarget": "minecraft:main",
+      "outtarget": "swap",
+      "uniforms": []
+    }
+  ]
+}

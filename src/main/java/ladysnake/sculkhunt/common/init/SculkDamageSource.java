@@ -1,4 +1,4 @@
-package ladysnake.sculkhunt.common.world;
+package ladysnake.sculkhunt.common.init;
 
 import net.minecraft.entity.damage.DamageSource;
 
