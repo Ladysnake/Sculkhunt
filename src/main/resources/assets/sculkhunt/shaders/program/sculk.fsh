@@ -9,7 +9,7 @@ precision mediump float;
 uniform sampler2D DiffuseSampler;
 
 uniform vec2 OutSize;
-uniform float Time;
+uniform float STime;
 
 in vec2 texCoord;
 
@@ -99,7 +99,7 @@ float turbulence (in vec2 st) {
     //
     // Loop of octaves
     for (int i = 0; i < OCTAVES; i++) {
-        value += amplitude * abs(snoise(vec3(st, Time/10.)));
+        value += amplitude * abs(snoise(vec3(st, STime/10.)));
         st *= 2.;
         amplitude *= .5;
     }
@@ -111,7 +111,8 @@ void main() {
     vec3 color = texture(DiffuseSampler, st).rgb;
     st.x *= OutSize.x/OutSize.y;
 
-    color *= turbulence(st*5.0);
+    float t = turbulence(st*5.0);
+    color *= 1. - pow(1. - t, 2. /* bigger number = better sight */);
 
     fragColor = vec4(color,1.0);
 }
