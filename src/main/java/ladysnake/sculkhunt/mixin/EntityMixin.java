@@ -1,7 +1,6 @@
 package ladysnake.sculkhunt.mixin;
 
 import ladysnake.sculkhunt.cca.SculkhuntComponents;
-import net.minecraft.client.render.Frustum;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;

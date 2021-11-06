@@ -6,8 +6,7 @@
     {
       "name": "sculkhunt:sculk",
       "intarget": "minecraft:main",
-      "outtarget": "swap",
-      "uniforms": []
+      "outtarget": "swap"
     },
     {
       "name": "blit",

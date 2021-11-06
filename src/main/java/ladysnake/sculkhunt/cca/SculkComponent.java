@@ -5,10 +5,9 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
 
 public class SculkComponent implements AutoSyncedComponent {
+    private final LivingEntity obj;
     private boolean isSculk = false;
     private int detectedTime = 0;
-
-    private final LivingEntity obj;
 
     public SculkComponent(LivingEntity obj) {
         this.obj = obj;

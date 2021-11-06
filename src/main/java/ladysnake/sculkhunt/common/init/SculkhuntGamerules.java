@@ -16,10 +16,10 @@ public class SculkhuntGamerules {
     public static void init() {
         SCULK_CATALYST_SPAWNING = registerGamerule("sculkCatalystSpawning", GameRuleFactory.createBooleanRule(false));
         SCULK_CATALYST_SPAWNING_DELAY = registerGamerule("sculkCatalystSpawningDelay", GameRuleFactory.createIntRule(250));
-        SCULK_CATALYST_SPAWNING_RADIUS = registerGamerule("sculkCatalystSpawningRadius", GameRuleFactory.createIntRule(30));
+        SCULK_CATALYST_SPAWNING_RADIUS = registerGamerule("sculkCatalystSpawningRadius", GameRuleFactory.createIntRule(50));
         SCULK_CATALYST_BLOOM_DELAY = registerGamerule("sculkCatalystBloomDelay", GameRuleFactory.createIntRule(200));
         SCULK_CATALYST_BLOOM_RADIUS = registerGamerule("sculkCatalystBloomRadius", GameRuleFactory.createIntRule(25));
-        SCULK_CATALYST_TERRITORY_RADIUS = registerGamerule("sculkCatalystTerritoryRadius", GameRuleFactory.createIntRule(50));
+        SCULK_CATALYST_TERRITORY_RADIUS = registerGamerule("sculkCatalystTerritoryRadius", GameRuleFactory.createIntRule(200));
         SCULK_CATALYST_MOB_SPAWN_FREQUENCY = registerGamerule("sculkCatalystMobSpawnFrequency", GameRuleFactory.createIntRule(250));
     }
 

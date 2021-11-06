@@ -5,13 +5,13 @@ import ladysnake.sculkhunt.cca.SculkhuntComponents;
 import ladysnake.sculkhunt.common.Sculkhunt;
 import ladysnake.sculkhunt.common.init.SculkhuntBlocks;
 import ladysnake.sculkhunt.common.init.SculkhuntDamageSources;
+import ladysnake.sculkhunt.common.init.SculkhuntDrops;
 import net.minecraft.entity.*;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundEvents;
@@ -53,6 +53,15 @@ public abstract class LivingEntityMixin extends Entity {
     @Shadow
     public abstract boolean isInsideWall();
 
+    @Shadow
+    public abstract boolean canMoveVoluntarily();
+
+    @Shadow
+    protected abstract boolean shouldSwimInFluids();
+
+    @Shadow
+    public abstract boolean canWalkOnFluid(Fluid fluid);
+
     @Inject(method = "onDeath", at = @At("HEAD"))
     public void onDeath(DamageSource source, CallbackInfo callbackInfo) {
         if (source == SculkhuntDamageSources.SCULK) {
@@ -82,6 +91,10 @@ public abstract class LivingEntityMixin extends Entity {
                         world.addParticle(new ItemStackParticleEffect(ParticleTypes.ITEM, new ItemStack(SculkhuntBlocks.SCULK)), this.getX() + random.nextGaussian() * this.getWidth() / 5f, this.getY() + random.nextGaussian() * this.getHeight() / 5f, this.getZ() + random.nextGaussian() * this.getWidth() / 5f, random.nextGaussian() / 10f, random.nextFloat() / 5f, random.nextGaussian() / 10f);
                     }
                     this.playSound(SoundEvents.BLOCK_SCULK_SENSOR_STEP, 1.0f, 0.9f);
+
+                    if (!((Object) this instanceof PlayerEntity) && this.age > 50) {
+                        this.discard();
+                    }
                 }
             }
         }
@@ -94,8 +107,8 @@ public abstract class LivingEntityMixin extends Entity {
             this.setInvisible(true);
 
             if (this.deathTime == 1) {
-                ItemEntity droppedItem = new ItemEntity(world, this.getX(), this.getY(), this.getZ(), new ItemStack(Sculkhunt.SCULK_DROPS[random.nextInt(Sculkhunt.SCULK_DROPS.length)], 1+random.nextInt(3)));
-                droppedItem.setVelocity(random.nextGaussian()/5f, random.nextGaussian()/5f, random.nextGaussian()/5f);
+                ItemEntity droppedItem = new ItemEntity(world, this.getX(), this.getY(), this.getZ(), SculkhuntDrops.getRandomDrop(random));
+                droppedItem.setVelocity(random.nextGaussian() / 5f, random.nextGaussian() / 5f, random.nextGaussian() / 5f);
                 world.spawnEntity(droppedItem);
             }
 

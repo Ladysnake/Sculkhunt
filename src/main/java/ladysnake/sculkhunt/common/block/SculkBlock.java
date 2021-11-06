@@ -3,10 +3,7 @@ package ladysnake.sculkhunt.common.block;
 import ladysnake.sculkhunt.cca.SculkhuntComponents;
 import ladysnake.sculkhunt.common.init.SculkhuntBlocks;
 import ladysnake.sculkhunt.common.init.SculkhuntDamageSources;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.ConnectingBlock;
-import net.minecraft.block.OreBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
@@ -17,6 +14,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
@@ -24,12 +22,16 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.intprovider.UniformIntProvider;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Random;
+
 public class SculkBlock extends OreBlock {
+    private static final int SCHEDULED_TICK_DELAY = 20;
+
     public SculkBlock(Settings settings, UniformIntProvider experienceDropped) {
         super(settings, experienceDropped);
     }
@@ -82,14 +84,31 @@ public class SculkBlock extends OreBlock {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (SculkhuntComponents.SCULK.get(player).isSculk() && world.getBlockState(player.getBlockPos().add(0, -1, 0)).getBlock() == SculkhuntBlocks.SCULK) {
+        if (SculkhuntComponents.SCULK.get(player).isSculk() && world.getBlockState(player.getBlockPos().add(0, -1, 0)).getBlock() == SculkhuntBlocks.SCULK && player.getMainHandStack().isEmpty()) {
             for (int i = 0; i < (player.getWidth() * player.getHeight()) * 100; i++) {
                 world.addParticle(new ItemStackParticleEffect(ParticleTypes.ITEM, new ItemStack(SculkhuntBlocks.SCULK)), player.getX() + player.getRandom().nextGaussian() * player.getWidth() / 2f, (player.getY() + player.getHeight() / 2f) + player.getRandom().nextGaussian() * player.getHeight() / 2f, player.getZ() + player.getRandom().nextGaussian() * player.getWidth() / 2f, player.getRandom().nextGaussian() / 10f, player.getRandom().nextFloat() / 10f, player.getRandom().nextGaussian() / 10f);
             }
             player.playSound(SoundEvents.BLOCK_SCULK_SENSOR_BREAK, 1.0f, 0.9f);
-            player.setPosition(pos.getX()+.5, pos.getY(), pos.getZ()+.5);
+            player.setPosition(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
         }
 
         return super.onUse(state, world, pos, player, hand, hit);
+    }
+
+
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        BubbleColumnBlock.update(world, pos.up(), state);
+    }
+
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+        if (direction == Direction.UP && neighborState.isOf(Blocks.WATER)) {
+            world.getBlockTickScheduler().schedule(pos, this, 20);
+        }
+
+        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
+    }
+
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        world.getBlockTickScheduler().schedule(pos, this, 20);
     }
 }

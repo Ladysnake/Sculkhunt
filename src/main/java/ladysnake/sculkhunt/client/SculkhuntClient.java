@@ -20,6 +20,7 @@ import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.util.Identifier;
 
@@ -27,7 +28,7 @@ import net.minecraft.util.Identifier;
 public class SculkhuntClient implements ClientModInitializer {
     public static final EntityModelLayer SCULK_CATALYST_MODEl_LAYER = new EntityModelLayer(new Identifier(Sculkhunt.MODID, "sculk_catalyst"), "main");
     private static final ManagedShaderEffect SCULK_SHADER = ShaderEffectManager.getInstance()
-            .manage(new Identifier("sculkhunt", "shaders/post/sculk.json"));
+            .manage(new Identifier("sculkhunt", "shaders/post/sculk_vision.json"));
     private static final Uniform1f TIME = SCULK_SHADER.findUniform1f("STime");
     private static int ticks;
     private static boolean enabled = true;
@@ -38,6 +39,7 @@ public class SculkhuntClient implements ClientModInitializer {
 
         EntityModelLayerRegistry.registerModelLayer(SCULK_CATALYST_MODEl_LAYER, SculkCatalystEntityModel::getTexturedModelData);
         net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(SculkhuntEntityTypes.SCULK_CATALYST, SculkCatalystEntityRenderer::new);
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(SculkhuntEntityTypes.SCULK_EYE, FlyingItemEntityRenderer::new);
 
         ParticleFactoryRegistry.getInstance().register(Sculkhunt.SOUND, SoundParticle.DefaultFactory::new);
 

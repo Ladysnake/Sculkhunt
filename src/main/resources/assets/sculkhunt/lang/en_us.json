@@ -1,4 +1,6 @@
 {
-  "item.sculkhunt.bombard": "Bombard",
-  "item.blast.bombard": "Bombard"
+  "block.sculkhunt.sculk_catalyst": "Sculk Catalyst",
+  "block.sculkhunt.sculk_vein": "Sculk Vein",
+  "block.sculkhunt.sculk": "Sculk",
+  "item.sculkhunt.sculk_eye": "Sculk Eye"
 }

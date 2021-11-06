@@ -4,16 +4,18 @@
   "package": "ladysnake.sculkhunt.mixin",
   "compatibilityLevel": "JAVA_16",
   "client": [
+    "client.EntityRenderDispatcherMixin",
     "client.LivingEntityRendererMixin",
     "client.PlayerEntityRendererMixin",
-    "client.RenderLayerAccessor",
-    "client.EntityRenderDispatcherMixin"
+    "client.RenderLayerAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "mixins": [
+    "EndPortalBlockMixin",
     "EntityMixin",
+    "GameEventMixin",
     "HostileEntityMixin",
     "HungerManagerMixin",
     "ItemEntityMixin",
@@ -26,6 +28,7 @@
     "SculkSensorBlockDetectionMixin",
     "SculkSensorListenerMixin",
     "ServerPlayerEntityMixin",
+    "ServerWorldMixin",
     "SoundEntityMixin"
   ]
 }
