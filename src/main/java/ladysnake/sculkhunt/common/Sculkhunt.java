@@ -49,7 +49,6 @@ public class Sculkhunt implements ModInitializer {
     public static ArrayList<UUID> playersToBeSculk = new ArrayList<>();
     public static ArrayList<UUID> playersToTurnToSculk = new ArrayList<>();
 
-    public static UUID targetedPlayer;
     public static int targetTimer;
 
     // event variables
@@ -97,7 +96,6 @@ public class Sculkhunt implements ModInitializer {
                 newPlayer.getAttributes().getCustomInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(sculkMaxHealth);
                 newPlayer.setHealth(0.1f);
                 newPlayer.getAttributes().getCustomInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(0.12f);
-                newPlayer.setHealth(newPlayer.getMaxHealth());
                 newPlayer.getAttributes().getCustomInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE).setBaseValue(4f);
                 newPlayer.giveItemStack(new ItemStack(SculkhuntBlocks.SCULK, 8));
 
@@ -109,16 +107,14 @@ public class Sculkhunt implements ModInitializer {
 
                 // respawn furthest from players
                 if (!players.isEmpty()) {
-                    if (targetedPlayer != null) {
-                        ServerPlayerEntity prey = (ServerPlayerEntity) world.getPlayerByUuid(targetedPlayer);
-                        catalysts = world.getEntitiesByClass(SculkCatalystEntity.class, new Box(prey.getX() - SPAWN_RADIUS, prey.getY() - SPAWN_RADIUS / 2f, prey.getZ() - SPAWN_RADIUS, prey.getX() + SPAWN_RADIUS, prey.getY() + SPAWN_RADIUS / 2f, prey.getZ() + SPAWN_RADIUS), sculkCatalystEntity -> !sculkCatalystEntity.isIncapacitated());
+                    ServerPlayerEntity prey = players.get(world.random.nextInt(players.size()));
+                    catalysts = world.getEntitiesByClass(SculkCatalystEntity.class, new Box(prey.getX() - SPAWN_RADIUS, prey.getY() - SPAWN_RADIUS / 2f, prey.getZ() - SPAWN_RADIUS, prey.getX() + SPAWN_RADIUS, prey.getY() + SPAWN_RADIUS / 2f, prey.getZ() + SPAWN_RADIUS), sculkCatalystEntity -> !sculkCatalystEntity.isIncapacitated());
 
-                        if (!catalysts.isEmpty()) {
-                            catalysts.sort((o1, o2) -> (int) (prey.getPos().distanceTo(o1.getPos()) - prey.getPos().distanceTo(o2.getPos())));
-                            Vec3d newPos = catalysts.get(0).getPos().add(world.random.nextGaussian() * 2, -newPlayer.getHeight() * 2, world.random.nextGaussian() * 2);
+                    if (!catalysts.isEmpty()) {
+                        catalysts.sort((o1, o2) -> (int) (prey.getPos().distanceTo(o1.getPos()) - prey.getPos().distanceTo(o2.getPos())));
+                        Vec3d newPos = catalysts.get(0).getPos().add(world.random.nextGaussian() * 2, -newPlayer.getHeight() * 2, world.random.nextGaussian() * 2);
 
-                            newPlayer.networkHandler.requestTeleport(newPos.getX(), newPos.getY(), newPos.getZ(), newPlayer.getYaw(), newPlayer.getPitch());
-                        }
+                        newPlayer.networkHandler.requestTeleport(newPos.getX(), newPos.getY(), newPos.getZ(), newPlayer.getYaw(), newPlayer.getPitch());
                     }
                 } else {
                     catalysts = world.getEntitiesByClass(SculkCatalystEntity.class, new Box(oldPlayer.getX() - SPAWN_RADIUS * 5f, oldPlayer.getY() - SPAWN_RADIUS * 5f / 2f, oldPlayer.getZ() - SPAWN_RADIUS * 5f, oldPlayer.getX() + SPAWN_RADIUS * 5f, oldPlayer.getY() + SPAWN_RADIUS * 5f / 2f, oldPlayer.getZ() + SPAWN_RADIUS * 5f), sculkCatalystEntity -> !sculkCatalystEntity.isIncapacitated());
@@ -135,17 +131,6 @@ public class Sculkhunt implements ModInitializer {
         // spawn sculk catalysts around players
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             if (sculkhuntPhase == 2) {
-                // change targeted player if time is up or empty, choose a random player that is not a sculk
-                if (targetTimer-- <= 0 || targetedPlayer == null || server.getPlayerManager().getPlayer(targetedPlayer) == null || SculkhuntComponents.SCULK.get(server.getPlayerManager().getPlayer(targetedPlayer)).isSculk()) {
-                    targetTimer = 3600; // 3 minutes
-                    List<ServerPlayerEntity> preys = server.getPlayerManager().getPlayerList().stream().filter(serverPlayerEntity -> !serverPlayerEntity.isCreative() && !serverPlayerEntity.isSpectator() && !SculkhuntComponents.SCULK.get(serverPlayerEntity).isSculk()).collect(Collectors.toList());
-                    if (!preys.isEmpty()) {
-                        targetedPlayer = preys.get(server.getOverworld().random.nextInt(preys.size())).getUuid();
-                    } else {
-//                        SculkhuntCommand.stopSculkhunt(server.getCommandSource());
-                    }
-                }
-
                 for (ServerWorld world : server.getWorlds()) {
                     if (world.getTime() % 20 == 0) {
                         for (ServerPlayerEntity player : world.getPlayers()) {

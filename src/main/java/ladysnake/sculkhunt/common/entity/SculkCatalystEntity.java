@@ -110,7 +110,7 @@ public class SculkCatalystEntity extends Entity {
             if (this.isIncapacitated()) {
                 this.incapacitatedTimer--;
 
-                if (this.age % 10 == 0) {
+                if (this.age % 5 == 0) {
                     ((ServerWorld) this.world).playSound(this.getX(), this.getY(), this.getZ(), SoundEvents.BLOCK_SCULK_SENSOR_BREAK, SoundCategory.BLOCKS, 1.0f, 1.5f, false);
                     ((ServerWorld) this.world).spawnParticles(Sculkhunt.SOUND, this.getX(), this.getY() + .5f, this.getZ(), 1, 0, 0, 0, 0);
                 }
@@ -229,6 +229,7 @@ public class SculkCatalystEntity extends Entity {
                         Vec3d newPos = catalysts.get(0).getPos().add(world.random.nextGaussian() * 2, -player.getHeight() * 2, world.random.nextGaussian() * 2);
 
                         ((ServerPlayerEntity) player).networkHandler.requestTeleport(newPos.getX(), newPos.getY(), newPos.getZ(), player.getYaw(), player.getPitch());
+                        player.setHealth(0.1f);
                     }
                 } else {
                     catalysts = world.getEntitiesByClass(SculkCatalystEntity.class, new Box(player.getX() - SPAWN_RADIUS * 5f, player.getY() - SPAWN_RADIUS * 5f / 2f, player.getZ() - SPAWN_RADIUS * 5f, player.getX() + SPAWN_RADIUS * 5f, player.getY() + SPAWN_RADIUS * 5f / 2f, player.getZ() + SPAWN_RADIUS * 5f), sculkCatalystEntity -> !sculkCatalystEntity.isIncapacitated());
@@ -237,6 +238,7 @@ public class SculkCatalystEntity extends Entity {
                         Vec3d newPos = catalysts.get(world.random.nextInt(catalysts.size())).getPos().add(world.random.nextGaussian() * 2, -player.getHeight() * 2, world.random.nextGaussian() * 2);
 
                         ((ServerPlayerEntity) player).networkHandler.requestTeleport(newPos.getX(), newPos.getY(), newPos.getZ(), player.getYaw(), player.getPitch());
+                        player.setHealth(0.1f);
                     }
                 }
             }
