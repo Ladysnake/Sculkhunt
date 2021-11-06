@@ -77,17 +77,20 @@ public class SculkBlock extends OreBlock {
         super.afterBreak(world, player, pos, state, blockEntity, stack);
 
         if (!world.isClient && SculkhuntComponents.SCULK.get(player).isSculk()) {
-            world.setBlockState(pos, SculkhuntBlocks.SCULK_VEIN.getDefaultState().with(ConnectingBlock.FACING_PROPERTIES.get(Direction.DOWN), true).with(ConnectingBlock.FACING_PROPERTIES.get(Direction.UP), false).with(ConnectingBlock.FACING_PROPERTIES.get(Direction.NORTH), false).with(ConnectingBlock.FACING_PROPERTIES.get(Direction.SOUTH), false).with(ConnectingBlock.FACING_PROPERTIES.get(Direction.EAST), false).with(ConnectingBlock.FACING_PROPERTIES.get(Direction.WEST), false));
+            if (world.getBlockState(pos.add(0, -1, 0)).isSolidBlock(world, pos.add(0, -1, 0))) {
+                world.setBlockState(pos, SculkhuntBlocks.SCULK_VEIN.getDefaultState().with(ConnectingBlock.FACING_PROPERTIES.get(Direction.DOWN), true).with(ConnectingBlock.FACING_PROPERTIES.get(Direction.UP), false).with(ConnectingBlock.FACING_PROPERTIES.get(Direction.NORTH), false).with(ConnectingBlock.FACING_PROPERTIES.get(Direction.SOUTH), false).with(ConnectingBlock.FACING_PROPERTIES.get(Direction.EAST), false).with(ConnectingBlock.FACING_PROPERTIES.get(Direction.WEST), false));
+            }
             player.getInventory().insertStack(new ItemStack(SculkhuntBlocks.SCULK, 1));
         }
     }
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (SculkhuntComponents.SCULK.get(player).isSculk() && world.getBlockState(player.getBlockPos().add(0, -1, 0)).getBlock() == SculkhuntBlocks.SCULK && player.getMainHandStack().isEmpty()) {
+        if (SculkhuntComponents.SCULK.get(player).isSculk() && player.getMainHandStack().isEmpty()) {
             for (int i = 0; i < (player.getWidth() * player.getHeight()) * 100; i++) {
                 world.addParticle(new ItemStackParticleEffect(ParticleTypes.ITEM, new ItemStack(SculkhuntBlocks.SCULK)), player.getX() + player.getRandom().nextGaussian() * player.getWidth() / 2f, (player.getY() + player.getHeight() / 2f) + player.getRandom().nextGaussian() * player.getHeight() / 2f, player.getZ() + player.getRandom().nextGaussian() * player.getWidth() / 2f, player.getRandom().nextGaussian() / 10f, player.getRandom().nextFloat() / 10f, player.getRandom().nextGaussian() / 10f);
             }
+            player.fallDistance = 0.0f;
             player.playSound(SoundEvents.BLOCK_SCULK_SENSOR_BREAK, 1.0f, 0.9f);
             player.setPosition(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
         }

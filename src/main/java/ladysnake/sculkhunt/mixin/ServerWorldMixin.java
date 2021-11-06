@@ -30,9 +30,6 @@ import java.util.List;
 public abstract class ServerWorldMixin {
 
     @Shadow
-    public abstract <T extends ParticleEffect> int spawnParticles(T particle, double x, double y, double z, int count, double deltaX, double deltaY, double deltaZ, double speed);
-
-    @Shadow
     protected abstract boolean sendToPlayerIfNearby(ServerPlayerEntity player, boolean force, double x, double y, double z, Packet<?> packet);
 
     @Shadow
@@ -45,7 +42,7 @@ public abstract class ServerWorldMixin {
     @Inject(method = "emitGameEvent", at = @At("HEAD"))
     public void emitGameEvent(@Nullable Entity entity, GameEvent event, BlockPos pos, CallbackInfo callbackInfo) {
         if ((entity instanceof LivingEntity && !SculkhuntComponents.SCULK.get(entity).isSculk()) || entity == null) {
-            if (event == GameEvent.PROJECTILE_LAND || event == GameEvent.DRINKING_FINISH || event == GameEvent.EAT || event == GameEvent.EXPLODE || event == GameEvent.PISTON_CONTRACT || event == GameEvent.PISTON_EXTEND || event == GameEvent.LIGHTNING_STRIKE || event == GameEvent.MINECART_MOVING || event == GameEvent.RAVAGER_ROAR || event == GameEvent.RING_BELL || event == GameEvent.BLOCK_OPEN || event == GameEvent.CONTAINER_OPEN) {
+            if (event == GameEvent.PROJECTILE_LAND || event == GameEvent.DRINKING_FINISH || (event == GameEvent.EAT && entity instanceof PlayerEntity) || event == GameEvent.EXPLODE || event == GameEvent.PISTON_CONTRACT || event == GameEvent.PISTON_EXTEND || event == GameEvent.LIGHTNING_STRIKE || event == GameEvent.MINECART_MOVING || event == GameEvent.RAVAGER_ROAR || event == GameEvent.RING_BELL || event == GameEvent.BLOCK_OPEN || event == GameEvent.CONTAINER_OPEN) {
                 Packet<?> packet = new ParticleS2CPacket(Sculkhunt.SOUND, true, pos.getX() + .5f, pos.getY() + .5f, pos.getZ() + .5f, 0, 0, 0, 0, 1);
                 for (ServerPlayerEntity player : this.getPlayers()) {
                     this.sendToPlayerIfNearby(player, true, pos.getX() + .5f, pos.getY() + .5f, pos.getZ() + .5f, packet);

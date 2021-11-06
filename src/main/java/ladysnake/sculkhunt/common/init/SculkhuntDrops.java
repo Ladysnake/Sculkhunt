@@ -21,7 +21,7 @@ public class SculkhuntDrops {
         DROPS.add(new DropEntry(Items.FERMENTED_SPIDER_EYE, 1, 1));
         DROPS.add(new DropEntry(Items.POISONOUS_POTATO, 1, 1));
         DROPS.add(new DropEntry(Items.ROTTEN_FLESH, 1, 5));
-        DROPS.add(new DropEntry(Items.EGG, 1, 6));
+        DROPS.add(new DropEntry(Items.EGG, 6, 9));
         DROPS.add(new DropEntry(Items.ARROW, 6, 9));
     }
 
