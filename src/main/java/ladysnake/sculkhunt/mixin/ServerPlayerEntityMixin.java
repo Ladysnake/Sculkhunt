@@ -2,6 +2,7 @@ package ladysnake.sculkhunt.mixin;
 
 import ladysnake.sculkhunt.cca.SculkhuntComponents;
 import ladysnake.sculkhunt.common.Sculkhunt;
+import ladysnake.sculkhunt.common.init.SculkhuntDamageSources;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -35,7 +36,7 @@ public abstract class ServerPlayerEntityMixin extends LivingEntity {
 
     @Inject(method = "onDeath", at = @At("HEAD"))
     public void onDeath(DamageSource source, CallbackInfo callbackInfo) {
-        if (Sculkhunt.sculkhuntPhase == 2) {
+        if (Sculkhunt.sculkhuntPhase == 2 || source == SculkhuntDamageSources.SCULK || (source.getAttacker() instanceof LivingEntity && SculkhuntComponents.SCULK.get(source.getAttacker()).isSculk())) {
             Sculkhunt.playersToTurnToSculk.add(this.getUuid());
 
             if (!SculkhuntComponents.SCULK.get(this).isSculk()) {

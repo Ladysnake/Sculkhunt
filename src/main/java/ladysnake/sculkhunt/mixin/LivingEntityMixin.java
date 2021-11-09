@@ -64,11 +64,13 @@ public abstract class LivingEntityMixin extends Entity {
     @Inject(method = "onDeath", at = @At("HEAD"))
     public void onDeath(DamageSource source, CallbackInfo callbackInfo) {
         if (source == SculkhuntDamageSources.SCULK) {
-            LivingEntity sculkedEntity = (LivingEntity) this.getType().create(world);
-            sculkedEntity.setPos(this.getX(), this.getY() - this.getHeight(), this.getZ());
-            sculkedEntity.updateTrackedPosition(this.getX(), this.getY() - this.getHeight(), this.getZ());
-            SculkhuntComponents.SCULK.get(sculkedEntity).setSculk(true);
-            sculkedEntity.world.spawnEntity(sculkedEntity);
+            if (!((Object) this instanceof PlayerEntity)) {
+                LivingEntity sculkedEntity = (LivingEntity) this.getType().create(world);
+                sculkedEntity.setPos(this.getX(), this.getY() - this.getHeight(), this.getZ());
+                sculkedEntity.updateTrackedPosition(this.getX(), this.getY() - this.getHeight(), this.getZ());
+                SculkhuntComponents.SCULK.get(sculkedEntity).setSculk(true);
+                sculkedEntity.world.spawnEntity(sculkedEntity);
+            }
         }
     }
 

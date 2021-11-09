@@ -42,17 +42,9 @@ public class SculkBlock extends OreBlock {
 
         if (entity instanceof LivingEntity) {
             if (!SculkhuntComponents.SCULK.get(entity).isSculk()) {
-                if (!(entity instanceof PlayerEntity)) {
-                    for (int i = 0; i < 25; i++) {
-                        world.addParticle(new ItemStackParticleEffect(ParticleTypes.ITEM, new ItemStack(SculkhuntBlocks.SCULK)), entity.getX() + world.random.nextGaussian() / 10f, entity.getY() + world.random.nextGaussian() / 10f, entity.getZ() + world.random.nextGaussian() / 10f, world.random.nextGaussian() / 10f, world.random.nextFloat() / 5f, world.random.nextGaussian() / 10f);
-                    }
-                    world.playSound(entity.getX(), entity.getY(), entity.getZ(), SoundEvents.BLOCK_SCULK_SENSOR_STEP, SoundCategory.NEUTRAL, 1.0f, 0.9f, true);
-
-                    entity.damage(SculkhuntDamageSources.SCULK, 2.0f);
-                }
-
                 ((LivingEntity) entity).addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 20, 1, false, false, false));
                 if (((LivingEntity) entity).getEquippedStack(EquipmentSlot.FEET).isEmpty()) {
+                    entity.damage(SculkhuntDamageSources.SCULK, 2.0f);
                     ((LivingEntity) entity).addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 20, 1, false, false, false));
                 }
             } else {
