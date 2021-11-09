@@ -13,11 +13,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleType;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
@@ -30,12 +26,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Iterator;
-import java.util.List;
-
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity {
     private final TargetPredicate PLAYERS_IN_RANGE_PREDICATE = TargetPredicate.createAttackable().setBaseMaxDistance(20.0D);
+    @Shadow
+    protected boolean isSubmergedInWater;
+    @Shadow
+    @Final
+    private PlayerInventory inventory;
 
     protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
@@ -55,13 +53,10 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     public abstract boolean isSwimming();
 
     @Shadow
-    protected boolean isSubmergedInWater;
+    public abstract PlayerInventory getInventory();
 
-    @Shadow public abstract PlayerInventory getInventory();
-
-    @Shadow @Final private PlayerInventory inventory;
-
-    @Shadow public abstract boolean isCreative();
+    @Shadow
+    public abstract boolean isCreative();
 
     @Inject(method = "tick", at = @At("TAIL"))
     public void tick(CallbackInfo callbackInfo) {

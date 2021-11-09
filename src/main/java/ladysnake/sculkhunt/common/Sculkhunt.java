@@ -97,7 +97,7 @@ public class Sculkhunt implements ModInitializer {
                 newPlayer.setHealth(0.1f);
                 newPlayer.getAttributes().getCustomInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(0.12f);
                 newPlayer.getAttributes().getCustomInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE).setBaseValue(4f);
-                newPlayer.giveItemStack(new ItemStack(SculkhuntBlocks.SCULK, 1+ newPlayer.getRandom().nextInt(3)));
+                newPlayer.giveItemStack(new ItemStack(SculkhuntBlocks.SCULK, 1 + newPlayer.getRandom().nextInt(3)));
 
                 // respawn in sculk
                 ServerWorld world = ((ServerWorld) newPlayer.world);

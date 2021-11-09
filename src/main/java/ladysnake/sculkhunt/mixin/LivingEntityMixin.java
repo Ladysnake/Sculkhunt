@@ -2,7 +2,6 @@ package ladysnake.sculkhunt.mixin;
 
 import com.google.common.collect.ImmutableList;
 import ladysnake.sculkhunt.cca.SculkhuntComponents;
-import ladysnake.sculkhunt.common.Sculkhunt;
 import ladysnake.sculkhunt.common.init.SculkhuntBlocks;
 import ladysnake.sculkhunt.common.init.SculkhuntDamageSources;
 import ladysnake.sculkhunt.common.init.SculkhuntDrops;

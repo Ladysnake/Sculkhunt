@@ -25,22 +25,26 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
     private Identifier changeTexture(Identifier originalTexture, LivingEntity livingEntity) throws IOException {
         if (SculkhuntComponents.SCULK.get(livingEntity).isSculk()) {
             if (this.texture == null) {
-                String textureSize = "6464";
-
                 if (livingEntity instanceof PlayerEntity) {
-                    this.texture = new Identifier("sculkhunt", "textures/entity/sculk_overlay_6464.png");
+                    this.texture = new Identifier("sculkhunt", "textures/entity/sculk_tracker.png");
                 } else {
-                    if (ResourceTextureUtil.load(MinecraftClient.getInstance().getResourceManager(), originalTexture).getWidth() == 32 && ResourceTextureUtil.load(MinecraftClient.getInstance().getResourceManager(), originalTexture).getHeight() == 32) {
-                        textureSize = "3232";
-                    } else if (ResourceTextureUtil.load(MinecraftClient.getInstance().getResourceManager(), originalTexture).getWidth() == 64 && ResourceTextureUtil.load(MinecraftClient.getInstance().getResourceManager(), originalTexture).getHeight() == 32) {
-                        textureSize = "6432";
-                    } else if (ResourceTextureUtil.load(MinecraftClient.getInstance().getResourceManager(), originalTexture).getWidth() == 64 && ResourceTextureUtil.load(MinecraftClient.getInstance().getResourceManager(), originalTexture).getHeight() == 64) {
-                        textureSize = "6464";
-                    } else if (ResourceTextureUtil.load(MinecraftClient.getInstance().getResourceManager(), originalTexture).getWidth() == 128 && ResourceTextureUtil.load(MinecraftClient.getInstance().getResourceManager(), originalTexture).getHeight() == 64) {
-                        textureSize = "12864";
-                    }
+                    String textureSize = "6464";
 
-                    this.texture = new Identifier("sculkhunt", "textures/entity/sculk_overlay_" + textureSize + ".png");
+                    if (livingEntity instanceof PlayerEntity) {
+                        this.texture = new Identifier("sculkhunt", "textures/entity/sculk_overlay_6464.png");
+                    } else {
+                        if (ResourceTextureUtil.load(MinecraftClient.getInstance().getResourceManager(), originalTexture).getWidth() == 32 && ResourceTextureUtil.load(MinecraftClient.getInstance().getResourceManager(), originalTexture).getHeight() == 32) {
+                            textureSize = "3232";
+                        } else if (ResourceTextureUtil.load(MinecraftClient.getInstance().getResourceManager(), originalTexture).getWidth() == 64 && ResourceTextureUtil.load(MinecraftClient.getInstance().getResourceManager(), originalTexture).getHeight() == 32) {
+                            textureSize = "6432";
+                        } else if (ResourceTextureUtil.load(MinecraftClient.getInstance().getResourceManager(), originalTexture).getWidth() == 64 && ResourceTextureUtil.load(MinecraftClient.getInstance().getResourceManager(), originalTexture).getHeight() == 64) {
+                            textureSize = "6464";
+                        } else if (ResourceTextureUtil.load(MinecraftClient.getInstance().getResourceManager(), originalTexture).getWidth() == 128 && ResourceTextureUtil.load(MinecraftClient.getInstance().getResourceManager(), originalTexture).getHeight() == 64) {
+                            textureSize = "12864";
+                        }
+
+                        this.texture = new Identifier("sculkhunt", "textures/entity/sculk_overlay_" + textureSize + ".png");
+                    }
                 }
             }
 

@@ -88,7 +88,7 @@ public class SculkBlock extends OreBlock {
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (SculkhuntComponents.SCULK.get(player).isSculk() && player.getMainHandStack().isEmpty()) {
             for (int i = 0; i < (player.getWidth() * player.getHeight()) * 100; i++) {
-                world.addParticle(new ItemStackParticleEffect(ParticleTypes.ITEM, new ItemStack(SculkhuntBlocks.SCULK)), player.getX() + player.getRandom().nextGaussian() * player.getWidth() / 2f, (player.getY() + player.getHeight() / 2f) + player.getRandom().nextGaussian() * player.getHeight() / 2f, player.getZ() + player.getRandom().nextGaussian() * player.getWidth() / 2f, player.getRandom().nextGaussian() / 10f, player.getRandom().nextFloat() / 10f, player.getRandom().nextGaussian() / 10f);
+                world.addParticle(new ItemStackParticleEffect(ParticleTypes.ITEM, new ItemStack(SculkhuntBlocks.SCULK_CATALYST)), player.getX() + player.getRandom().nextGaussian() * player.getWidth() / 2f, (player.getY() + player.getHeight() / 2f) + player.getRandom().nextGaussian() * player.getHeight() / 2f, player.getZ() + player.getRandom().nextGaussian() * player.getWidth() / 2f, player.getRandom().nextGaussian() / 10f, player.getRandom().nextFloat() / 10f, player.getRandom().nextGaussian() / 10f);
             }
             player.fallDistance = 0.0f;
             player.playSound(SoundEvents.BLOCK_SCULK_SENSOR_BREAK, 1.0f, 0.9f);

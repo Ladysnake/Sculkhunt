@@ -1,12 +1,10 @@
 package ladysnake.sculkhunt.common.init;
 
-import ladysnake.sculkhunt.common.Sculkhunt;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
 
 public class SculkhuntDrops {
@@ -27,7 +25,7 @@ public class SculkhuntDrops {
 
     public static ItemStack getRandomDrop(Random random) {
         DropEntry drop = DROPS.get(random.nextInt(DROPS.size()));
-        return new ItemStack(drop.item, drop.minCount + random.nextInt(drop.maxCount - drop.minCount +1));
+        return new ItemStack(drop.item, drop.minCount + random.nextInt(drop.maxCount - drop.minCount + 1));
     }
 
 }
