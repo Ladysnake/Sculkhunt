@@ -47,7 +47,7 @@
 - Sculk
 
   - Slows down survivor players (if they don't wear boots) and gives them mining fatigue
-  - Slows down and damages non-sculk mobs
+  - Slows down and damages non-sculk entities and players
   - Makes sculk mobs and trackers faster and gives them regeneration
   - When a mob dies on sculk, a sculk copy of the mob will rise from it
   - Absorbs and destroys all non-living entities like items, boats, tnt, etc...
@@ -86,3 +86,4 @@
 - Use projectiles like arrows, eggs, snowballs, etc... to bamboozle sculk trackers to another position.
 - Noise machines with opening trapdoors, extending pistons, bells, etc... can be useful to hide your position and scramble your tracks.
 - Sculk trackers have a hard time distinguishing blocks in bright environments, so use this to your advantage by making lava traps for example.
+- Mining blocks by hand or with wooden tools doesn't make any sound, so prioritize them if you wish to stay under the radar.

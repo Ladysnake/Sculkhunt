@@ -3,6 +3,7 @@ package ladysnake.sculkhunt.common.block;
 import ladysnake.sculkhunt.cca.SculkhuntComponents;
 import ladysnake.sculkhunt.common.init.SculkhuntBlocks;
 import ladysnake.sculkhunt.common.init.SculkhuntDamageSources;
+import ladysnake.sculkhunt.common.init.SculkhuntItems;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
@@ -12,6 +13,8 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsage;
+import net.minecraft.item.Items;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
@@ -85,6 +88,13 @@ public class SculkBlock extends OreBlock {
             player.fallDistance = 0.0f;
             player.playSound(SoundEvents.BLOCK_SCULK_SENSOR_BREAK, 1.0f, 0.9f);
             player.setPosition(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
+        }
+
+        if (!SculkhuntComponents.SCULK.get(player).isSculk() && player.getMainHandStack().getItem() == Items.GLASS_BOTTLE) {
+            world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.NEUTRAL, 1.0F, 0.8F);
+//            ItemUsage.exchangeStack(player.getMainHandStack(), player, new ItemStack(SculkhuntItems.SCULK_BOTTLE));
+            player.getMainHandStack().decrement(1);
+            player.getInventory().insertStack(new ItemStack(SculkhuntItems.SCULK_BOTTLE));
         }
 
         return super.onUse(state, world, pos, player, hand, hit);
