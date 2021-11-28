@@ -35,11 +35,15 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static ladysnake.sculkhunt.common.Sculkhunt.SPAWN_RADIUS;
 
@@ -225,21 +229,31 @@ public class SculkCatalystEntity extends Entity {
                     catalysts = world.getEntitiesByClass(SculkCatalystEntity.class, new Box(prey.getX() - SPAWN_RADIUS, prey.getY() - SPAWN_RADIUS / 2f, prey.getZ() - SPAWN_RADIUS, prey.getX() + SPAWN_RADIUS, prey.getY() + SPAWN_RADIUS / 2f, prey.getZ() + SPAWN_RADIUS), sculkCatalystEntity -> !sculkCatalystEntity.isIncapacitated());
 
                     if (!catalysts.isEmpty()) {
-                        catalysts.sort((o1, o2) -> (int) (prey.getPos().distanceTo(o1.getPos()) - prey.getPos().distanceTo(o2.getPos())));
-                        Vec3d newPos = catalysts.get(0).getPos().add(world.random.nextGaussian() * 2, -player.getHeight() * 2, world.random.nextGaussian() * 2);
+                        // filter catalysts that aren't in a 16 block radius of the player
+                        catalysts = catalysts.stream().filter(sculkCatalystEntity -> sculkCatalystEntity.getBlockPos().getSquaredDistance(prey.getBlockPos()) >= 16).collect(Collectors.toList());
+                        if (!catalysts.isEmpty()) {
+                            catalysts.sort((o1, o2) -> (int) (prey.getPos().distanceTo(o1.getPos()) - prey.getPos().distanceTo(o2.getPos())));
+                            BlockPos newPos = new BlockPos(catalysts.get(0).getPos().add(world.random.nextGaussian() * 2, 0, world.random.nextGaussian() * 2));
 
-                        ((ServerPlayerEntity) player).networkHandler.requestTeleport(newPos.getX(), newPos.getY(), newPos.getZ(), player.getYaw(), player.getPitch());
-                        player.setHealth(0.1f);
+                            int tries = 25;
+                            while (tries > 0 && !world.getBlockState(newPos).isAir() && !world.getBlockState(newPos.add(0, 1, 0)).isAir()) {
+                                tries--;
+                                newPos = new BlockPos(catalysts.get(0).getPos().add(world.random.nextGaussian() * 2, 0, world.random.nextGaussian() * 2));
+                            }
+
+                            if (world.getBlockState(newPos).isAir() && world.getBlockState(newPos.add(0, 1, 0)).isAir()) {
+                                ((ServerPlayerEntity) player).networkHandler.requestTeleport(newPos.getX(), newPos.getY() - player.getHeight() * 2, newPos.getZ(), player.getYaw(), player.getPitch());
+                            } else {
+                                Sculkhunt.respawnAtRandomCatalyst(world, ((ServerPlayerEntity) player), ((ServerPlayerEntity) player));
+                            }
+                        } else {
+                            Sculkhunt.respawnAtRandomCatalyst(world, ((ServerPlayerEntity) player), ((ServerPlayerEntity) player));
+                        }
+                    } else {
+                        Sculkhunt.respawnAtRandomCatalyst(world, ((ServerPlayerEntity) player), ((ServerPlayerEntity) player));
                     }
                 } else {
-                    catalysts = world.getEntitiesByClass(SculkCatalystEntity.class, new Box(player.getX() - SPAWN_RADIUS * 5f, player.getY() - SPAWN_RADIUS * 5f / 2f, player.getZ() - SPAWN_RADIUS * 5f, player.getX() + SPAWN_RADIUS * 5f, player.getY() + SPAWN_RADIUS * 5f / 2f, player.getZ() + SPAWN_RADIUS * 5f), sculkCatalystEntity -> !sculkCatalystEntity.isIncapacitated());
-
-                    if (!catalysts.isEmpty()) {
-                        Vec3d newPos = catalysts.get(world.random.nextInt(catalysts.size())).getPos().add(world.random.nextGaussian() * 2, -player.getHeight() * 2, world.random.nextGaussian() * 2);
-
-                        ((ServerPlayerEntity) player).networkHandler.requestTeleport(newPos.getX(), newPos.getY(), newPos.getZ(), player.getYaw(), player.getPitch());
-                        player.setHealth(0.1f);
-                    }
+                    Sculkhunt.respawnAtRandomCatalyst(world, ((ServerPlayerEntity) player), ((ServerPlayerEntity) player));
                 }
             }
         }

@@ -2,6 +2,7 @@ package ladysnake.sculkhunt.common;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import ladysnake.sculkhunt.cca.SculkhuntComponents;
+import ladysnake.sculkhunt.common.command.SculkBlacklistCommand;
 import ladysnake.sculkhunt.common.command.SculkhuntCommand;
 import ladysnake.sculkhunt.common.entity.SculkCatalystEntity;
 import ladysnake.sculkhunt.common.init.*;
@@ -46,18 +47,24 @@ public class Sculkhunt implements ModInitializer {
     public static final String MODID = "sculkhunt";
     public static final int SPAWN_RADIUS = 250;
 
-    public static ArrayList<UUID> playersToBeSculk = new ArrayList<>();
+    public static List<UUID> playersToBeSculk = new ArrayList<>();
     public static ArrayList<UUID> playersToTurnToSculk = new ArrayList<>();
 
     public static int targetTimer;
 
     // event variables
     public static int sculkhuntPhase = 0; // 0: no sculkhunt event, 1: preparation, 2: hunt
-    public static int prepTime; // 15 minutes of preparation time
+    public static int prepTime; // preparation time
+    public static ArrayList<UUID> SCULK_BLACKLIST;
+
     public static DefaultParticleType SOUND;
 
     public static boolean isBlockReplaceable(World world, BlockPos blockPos) {
         return (world.getBlockState(blockPos).isAir() || world.getBlockState(blockPos).getMaterial() == Material.BAMBOO || world.getBlockState(blockPos).getMaterial() == Material.BAMBOO_SAPLING || world.getBlockState(blockPos).getMaterial() == Material.COBWEB || world.getBlockState(blockPos).getMaterial() == Material.FIRE || world.getBlockState(blockPos).getMaterial() == Material.CARPET || world.getBlockState(blockPos).getMaterial() == Material.CACTUS || world.getBlockState(blockPos).getMaterial() == Material.PLANT || world.getBlockState(blockPos).getMaterial() == Material.REPLACEABLE_PLANT || world.getBlockState(blockPos).getMaterial() == Material.REPLACEABLE_UNDERWATER_PLANT || world.getBlockState(blockPos).getMaterial() == Material.SNOW_LAYER || world.getBlockState(blockPos).getBlock() == Blocks.WATER);
+    }
+
+    public static boolean isBlockReplaceableNotUnderwater(World world, BlockPos blockPos) {
+        return (world.getBlockState(blockPos).isAir() || world.getBlockState(blockPos).getMaterial() == Material.BAMBOO || world.getBlockState(blockPos).getMaterial() == Material.BAMBOO_SAPLING || world.getBlockState(blockPos).getMaterial() == Material.COBWEB || world.getBlockState(blockPos).getMaterial() == Material.FIRE || world.getBlockState(blockPos).getMaterial() == Material.CARPET || world.getBlockState(blockPos).getMaterial() == Material.CACTUS || world.getBlockState(blockPos).getMaterial() == Material.PLANT || world.getBlockState(blockPos).getMaterial() == Material.REPLACEABLE_PLANT || world.getBlockState(blockPos).getMaterial() == Material.SNOW_LAYER);
     }
 
     @Override
@@ -69,10 +76,12 @@ public class Sculkhunt implements ModInitializer {
         SculkhuntGamerules.init();
         SculkhuntDrops.init();
 
+        SCULK_BLACKLIST = new ArrayList<>();
         SOUND = Registry.register(Registry.PARTICLE_TYPE, Sculkhunt.MODID + ":sound", FabricParticleTypes.simple(true));
 
         CommandRegistrationCallback.EVENT.register((commandDispatcher, b) -> {
                     SculkhuntCommand.register(commandDispatcher);
+                    SculkBlacklistCommand.register(commandDispatcher);
                 }
         );
 
@@ -84,17 +93,19 @@ public class Sculkhunt implements ModInitializer {
 
             if (SculkhuntComponents.SCULK.get(newPlayer).isSculk()) {
                 float sculkPercentage = getSculkPlayerPercentage(newPlayer.getServerWorld());
-                float sculkMaxHealth = 10f;
+                float sculkMaxHealth = 12f;
                 if (sculkPercentage >= 0.8f) {
                     sculkMaxHealth = 4f;
                 } else if (sculkPercentage >= 0.6f) {
                     sculkMaxHealth = 6f;
                 } else if (sculkPercentage >= 0.4f) {
                     sculkMaxHealth = 8f;
+                } else if (sculkPercentage >= 0.2f) {
+                    sculkMaxHealth = 10f;
                 }
 
                 newPlayer.getAttributes().getCustomInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(sculkMaxHealth);
-                newPlayer.setHealth(0.1f);
+                newPlayer.setHealth(newPlayer.getMaxHealth());
                 newPlayer.getAttributes().getCustomInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(0.12f);
                 newPlayer.getAttributes().getCustomInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE).setBaseValue(4f);
                 newPlayer.giveItemStack(new ItemStack(SculkhuntBlocks.SCULK, 1 + newPlayer.getRandom().nextInt(3)));
@@ -105,25 +116,36 @@ public class Sculkhunt implements ModInitializer {
                 List<ServerPlayerEntity> players = world.getPlayers(serverPlayerEntity -> !serverPlayerEntity.isCreative() && !serverPlayerEntity.isSpectator() && !SculkhuntComponents.SCULK.get(serverPlayerEntity).isSculk());
                 List<SculkCatalystEntity> catalysts;
 
-                // respawn furthest from players
                 if (!players.isEmpty()) {
                     ServerPlayerEntity prey = players.get(world.random.nextInt(players.size()));
                     catalysts = world.getEntitiesByClass(SculkCatalystEntity.class, new Box(prey.getX() - SPAWN_RADIUS, prey.getY() - SPAWN_RADIUS / 2f, prey.getZ() - SPAWN_RADIUS, prey.getX() + SPAWN_RADIUS, prey.getY() + SPAWN_RADIUS / 2f, prey.getZ() + SPAWN_RADIUS), sculkCatalystEntity -> !sculkCatalystEntity.isIncapacitated());
 
                     if (!catalysts.isEmpty()) {
-                        catalysts.sort((o1, o2) -> (int) (prey.getPos().distanceTo(o1.getPos()) - prey.getPos().distanceTo(o2.getPos())));
-                        Vec3d newPos = catalysts.get(0).getPos().add(world.random.nextGaussian() * 2, -newPlayer.getHeight() * 2, world.random.nextGaussian() * 2);
+                        // filter catalysts that aren't in a 16 block radius of the player
+                        catalysts = catalysts.stream().filter(sculkCatalystEntity -> sculkCatalystEntity.getBlockPos().getSquaredDistance(prey.getBlockPos()) >= 16).collect(Collectors.toList());
+                        if (!catalysts.isEmpty()) {
+                            catalysts.sort((o1, o2) -> (int) (prey.getPos().distanceTo(o1.getPos()) - prey.getPos().distanceTo(o2.getPos())));
+                            BlockPos newPos = new BlockPos(catalysts.get(0).getPos().add(world.random.nextGaussian() * 2, 0, world.random.nextGaussian() * 2));
 
-                        newPlayer.networkHandler.requestTeleport(newPos.getX(), newPos.getY(), newPos.getZ(), newPlayer.getYaw(), newPlayer.getPitch());
+                            int tries = 25;
+                            while (tries > 0 && !world.getBlockState(newPos).isAir() && !world.getBlockState(newPos.add(0, 1, 0)).isAir()) {
+                                tries--;
+                                newPos = new BlockPos(catalysts.get(0).getPos().add(world.random.nextGaussian() * 2, 0, world.random.nextGaussian() * 2));
+                            }
+
+                            if (world.getBlockState(newPos).isAir() && world.getBlockState(newPos.add(0, 1, 0)).isAir()) {
+                                newPlayer.networkHandler.requestTeleport(newPos.getX(), newPos.getY() - newPlayer.getHeight() * 2, newPos.getZ(), newPlayer.getYaw(), newPlayer.getPitch());
+                            } else {
+                                Sculkhunt.respawnAtRandomCatalyst(world, oldPlayer, newPlayer);
+                            }
+                        } else {
+                            Sculkhunt.respawnAtRandomCatalyst(world, oldPlayer, newPlayer);
+                        }
+                    } else {
+                        respawnAtRandomCatalyst(world, oldPlayer, newPlayer);
                     }
                 } else {
-                    catalysts = world.getEntitiesByClass(SculkCatalystEntity.class, new Box(oldPlayer.getX() - SPAWN_RADIUS * 5f, oldPlayer.getY() - SPAWN_RADIUS * 5f / 2f, oldPlayer.getZ() - SPAWN_RADIUS * 5f, oldPlayer.getX() + SPAWN_RADIUS * 5f, oldPlayer.getY() + SPAWN_RADIUS * 5f / 2f, oldPlayer.getZ() + SPAWN_RADIUS * 5f), sculkCatalystEntity -> !sculkCatalystEntity.isIncapacitated());
-
-                    if (!catalysts.isEmpty()) {
-                        Vec3d newPos = catalysts.get(world.random.nextInt(catalysts.size())).getPos().add(world.random.nextGaussian() * 2, -newPlayer.getHeight() * 2, world.random.nextGaussian() * 2);
-
-                        newPlayer.networkHandler.requestTeleport(newPos.getX(), newPos.getY(), newPos.getZ(), newPlayer.getYaw(), newPlayer.getPitch());
-                    }
+                    respawnAtRandomCatalyst(world, oldPlayer, newPlayer);
                 }
             }
         });
@@ -193,7 +215,7 @@ public class Sculkhunt implements ModInitializer {
 //                                serverPlayerEntity.sendMessage(message, false);
 //                            }
 
-                                playerToSculk.getAttributes().getCustomInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(10f);
+                                playerToSculk.getAttributes().getCustomInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(12f);
                                 playerToSculk.getAttributes().getCustomInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(0.12f);
                                 playerToSculk.setHealth(playerToSculk.getMaxHealth());
                                 playerToSculk.getAttributes().getCustomInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE).setBaseValue(4f);
@@ -216,12 +238,12 @@ public class Sculkhunt implements ModInitializer {
 
                             while (placePos.getY() > 1 &&
                                     !(world.getBlockState(placePos.add(0, -1, 0)).isSolidBlock(world, placePos.add(0, -1, 0))
-                                            && isBlockReplaceable(world, placePos) && isBlockReplaceable(world, placePos.add(0, 1, 0)))) {
+                                            && isBlockReplaceableNotUnderwater(world, placePos) && isBlockReplaceableNotUnderwater(world, placePos.add(0, 1, 0)))) {
                                 placePos = placePos.add(0, -1, 0);
                             }
 
                             if (world.getBlockState(placePos.add(0, -1, 0)).isSolidBlock(world, placePos.add(0, -1, 0))
-                                    && isBlockReplaceable(world, placePos)) {
+                                    && isBlockReplaceableNotUnderwater(world, placePos)) {
                                 SculkCatalystEntity sculkCatalystEntity = SculkhuntEntityTypes.SCULK_CATALYST.create(world);
                                 sculkCatalystEntity.refreshPositionAndAngles(placePos.getX() + .5f, placePos.getY(), placePos.getZ() + .5f, 0, 0);
                                 world.spawnEntity(sculkCatalystEntity);
@@ -239,6 +261,16 @@ public class Sculkhunt implements ModInitializer {
         float sculkPLayerAmount = (float) playingPlayers.stream().filter(serverPlayerEntity -> SculkhuntComponents.SCULK.get(serverPlayerEntity).isSculk()).count();
 
         return sculkPLayerAmount / ((float) playingPlayers.size());
+    }
+
+    public static void respawnAtRandomCatalyst(World world, ServerPlayerEntity oldPlayer, ServerPlayerEntity newPlayer) {
+        List<SculkCatalystEntity> catalysts = world.getEntitiesByClass(SculkCatalystEntity.class, new Box(oldPlayer.getX() - SPAWN_RADIUS * 5f, oldPlayer.getY() - SPAWN_RADIUS * 5f / 2f, oldPlayer.getZ() - SPAWN_RADIUS * 5f, oldPlayer.getX() + SPAWN_RADIUS * 5f, oldPlayer.getY() + SPAWN_RADIUS * 5f / 2f, oldPlayer.getZ() + SPAWN_RADIUS * 5f), sculkCatalystEntity -> !sculkCatalystEntity.isIncapacitated());
+
+        if (!catalysts.isEmpty()) {
+            Vec3d newPos = catalysts.get(world.random.nextInt(catalysts.size())).getPos().add(world.random.nextGaussian() * 2, -newPlayer.getHeight() * 2, world.random.nextGaussian() * 2);
+
+            newPlayer.networkHandler.requestTeleport(newPos.getX(), newPos.getY(), newPos.getZ(), newPlayer.getYaw(), newPlayer.getPitch());
+        }
     }
 
 }

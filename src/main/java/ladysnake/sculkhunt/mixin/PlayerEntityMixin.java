@@ -4,6 +4,7 @@ import ladysnake.sculkhunt.cca.SculkhuntComponents;
 import ladysnake.sculkhunt.common.Sculkhunt;
 import ladysnake.sculkhunt.common.init.SculkhuntBlocks;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.TargetPredicate;
@@ -128,9 +129,9 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         }
     }
 
-    @Inject(method = "damage", at = @At("TAIL"), cancellable = true)
-    public void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> callbackInfoReturnable) {
-        if (!SculkhuntComponents.SCULK.get(this).isSculk()) {
+    @Inject(method = "collideWithEntity", at = @At("TAIL"), cancellable = true)
+    public void collideWithEntity(Entity entity, CallbackInfo callbackInfo) {
+        if (!SculkhuntComponents.SCULK.get(this).isSculk() && entity instanceof PlayerEntity && !SculkhuntComponents.SCULK.get(entity).isSculk()) {
             SculkhuntComponents.SCULK.get(this).setDetectedTime(20);
         }
     }

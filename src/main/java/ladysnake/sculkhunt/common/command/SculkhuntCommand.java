@@ -25,11 +25,12 @@ import net.minecraft.world.GameRules;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class SculkhuntCommand {
-    private static final int PREP_DEFAULT_DURATION = 900; // 15 minutes of preparation time
+    private static final int PREP_DEFAULT_DURATION = 1200; // 20 minutes of preparation time
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register((LiteralArgumentBuilder) ((LiteralArgumentBuilder) CommandManager.literal("sculkhunt").requires((source) -> {
@@ -80,6 +81,9 @@ public class SculkhuntCommand {
         int sculkPlayers = Math.max(1, Math.round(playerPool.size() / 5f)); // 1 in 5 players / 20% become sculk at the start
         for (int i = 0; i < sculkPlayers; i++) {
             if (!playerPool.isEmpty()) {
+                for (UUID uuid : Sculkhunt.SCULK_BLACKLIST) {
+                    playerPool.remove(server.getPlayerManager().getPlayer(uuid));
+                }
                 ServerPlayerEntity playerToBeSculk = playerPool.get(server.getOverworld().random.nextInt(playerPool.size()));
 
                 Sculkhunt.playersToBeSculk.add(playerToBeSculk.getUuid());
