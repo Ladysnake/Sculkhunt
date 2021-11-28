@@ -13,14 +13,11 @@ public class SculkhuntDrops {
 
     public static void init() {
         DROPS.add(new DropEntry(Items.PORKCHOP, 1, 3));
-        DROPS.add(new DropEntry(Items.CHICKEN, 1, 1));
         DROPS.add(new DropEntry(Items.BEEF, 1, 3));
         DROPS.add(new DropEntry(Items.MUTTON, 1, 3));
-        DROPS.add(new DropEntry(Items.FERMENTED_SPIDER_EYE, 1, 1));
-        DROPS.add(new DropEntry(Items.POISONOUS_POTATO, 1, 1));
-        DROPS.add(new DropEntry(Items.ROTTEN_FLESH, 1, 5));
-        DROPS.add(new DropEntry(Items.EGG, 6, 9));
+        DROPS.add(new DropEntry(Items.SNOWBALL, 6, 9));
         DROPS.add(new DropEntry(Items.ARROW, 6, 9));
+        DROPS.add(new DropEntry(Items.ENDER_PEARL, 1, 1));
     }
 
     public static ItemStack getRandomDrop(Random random) {
