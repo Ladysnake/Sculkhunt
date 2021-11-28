@@ -229,8 +229,8 @@ public class SculkCatalystEntity extends Entity {
                     catalysts = world.getEntitiesByClass(SculkCatalystEntity.class, new Box(prey.getX() - SPAWN_RADIUS, prey.getY() - SPAWN_RADIUS / 2f, prey.getZ() - SPAWN_RADIUS, prey.getX() + SPAWN_RADIUS, prey.getY() + SPAWN_RADIUS / 2f, prey.getZ() + SPAWN_RADIUS), sculkCatalystEntity -> !sculkCatalystEntity.isIncapacitated());
 
                     if (!catalysts.isEmpty()) {
-                        // filter catalysts that aren't in a 16 block radius of the player
-                        catalysts = catalysts.stream().filter(sculkCatalystEntity -> sculkCatalystEntity.getBlockPos().getSquaredDistance(prey.getBlockPos()) >= 16).collect(Collectors.toList());
+                        // filter catalysts that aren't in a 30 block radius of the player
+                        catalysts = catalysts.stream().filter(sculkCatalystEntity -> sculkCatalystEntity.getBlockPos().getSquaredDistance(prey.getBlockPos()) >= 30).collect(Collectors.toList());
                         if (!catalysts.isEmpty()) {
                             catalysts.sort((o1, o2) -> (int) (prey.getPos().distanceTo(o1.getPos()) - prey.getPos().distanceTo(o2.getPos())));
                             BlockPos newPos = new BlockPos(catalysts.get(0).getPos().add(world.random.nextGaussian() * 2, 0, world.random.nextGaussian() * 2));
