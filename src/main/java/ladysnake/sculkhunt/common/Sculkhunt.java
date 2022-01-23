@@ -134,7 +134,7 @@ public class Sculkhunt implements ModInitializer {
                             BlockPos newPos = new BlockPos(catalysts.get(0).getPos().add(world.random.nextGaussian() * 2, 0, world.random.nextGaussian() * 2));
 
                             int tries = 25;
-                            while (tries > 0 && !world.getBlockState(newPos).isAir() && !world.getBlockState(newPos.add(0, 1, 0)).isAir()) {
+                            while (tries > 0 && !world.getBlockState(newPos).isAir() && !world.getBlockState(newPos.add(0, 1, 0)).isAir() && !world.getBlockState(newPos.add(0, 2, 0)).isAir()) {
                                 tries--;
                                 newPos = new BlockPos(catalysts.get(0).getPos().add(world.random.nextGaussian() * 2, 0, world.random.nextGaussian() * 2));
                             }
