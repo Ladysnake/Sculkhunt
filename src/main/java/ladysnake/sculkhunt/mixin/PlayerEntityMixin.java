@@ -68,6 +68,13 @@ public abstract class PlayerEntityMixin extends LivingEntity {
             }
         }
 
+        // detect closeby players
+        for (PlayerEntity player : world.getPlayers(TargetPredicate.DEFAULT, this, this.getBoundingBox().expand(0.5f))) {
+            if (SculkhuntComponents.SCULK.get(this).isSculk() && !SculkhuntComponents.SCULK.get(player).isSculk()) {
+                SculkhuntComponents.SCULK.get(player).setDetectedTime(50);
+            }
+        }
+
         // emit smell particles to indicate general area
 //        if (!SculkhuntComponents.SCULK.get(this).isSculk()) {
 //            for (int i = 0; i < 20; i++) {
@@ -127,15 +134,13 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         if (SculkhuntComponents.SCULK.get(this).isSculk() && SculkhuntComponents.SCULK.get(player).isSculk()) {
             callbackInfoReturnable.setReturnValue(false);
         }
-        if (SculkhuntComponents.SCULK.get(this).isSculk() && !SculkhuntComponents.SCULK.get(player).isSculk() && ) {
+
+        if (SculkhuntComponents.SCULK.get(this).isSculk() && !SculkhuntComponents.SCULK.get(player).isSculk() && !this.canSee(player)) {
             callbackInfoReturnable.setReturnValue(false);
         }
     }
 
     @Inject(method = "collideWithEntity", at = @At("TAIL"), cancellable = true)
     public void collideWithEntity(Entity entity, CallbackInfo callbackInfo) {
-        if (!SculkhuntComponents.SCULK.get(this).isSculk() && entity instanceof PlayerEntity && !SculkhuntComponents.SCULK.get(entity).isSculk()) {
-            SculkhuntComponents.SCULK.get(this).setDetectedTime(40);
-        }
     }
 }
