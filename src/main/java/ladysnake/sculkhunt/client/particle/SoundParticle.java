@@ -27,9 +27,9 @@ public class SoundParticle extends SpriteBillboardParticle {
         this.maxAge = 10;
         this.collidesWithWorld = false;
 
-        this.colorRed = 1f;
-        this.colorGreen = 1f;
-        this.colorBlue = 1f;
+        this.red = 1f;
+        this.green = 1f;
+        this.blue = 1f;
     }
 
     @Override
@@ -69,12 +69,12 @@ public class SoundParticle extends SpriteBillboardParticle {
             float minV = this.getMinV();
             float maxV = this.getMaxV();
             int l = 15728880;
-            float a = Math.min(1f, Math.max(0f, this.colorAlpha));
+            float a = Math.min(1f, Math.max(0f, this.alpha));
 
-            vertexConsumer.vertex(Vec3fs[0].getX(), Vec3fs[0].getY(), Vec3fs[0].getZ()).texture(maxU, maxV).color(colorRed, colorGreen, colorBlue, colorAlpha).light(l).next();
-            vertexConsumer.vertex(Vec3fs[1].getX(), Vec3fs[1].getY(), Vec3fs[1].getZ()).texture(maxU, minV).color(colorRed, colorGreen, colorBlue, colorAlpha).light(l).next();
-            vertexConsumer.vertex(Vec3fs[2].getX(), Vec3fs[2].getY(), Vec3fs[2].getZ()).texture(minU, minV).color(colorRed, colorGreen, colorBlue, colorAlpha).light(l).next();
-            vertexConsumer.vertex(Vec3fs[3].getX(), Vec3fs[3].getY(), Vec3fs[3].getZ()).texture(minU, maxV).color(colorRed, colorGreen, colorBlue, colorAlpha).light(l).next();
+            vertexConsumer.vertex(Vec3fs[0].getX(), Vec3fs[0].getY(), Vec3fs[0].getZ()).texture(maxU, maxV).color(red, green, blue, alpha).light(l).next();
+            vertexConsumer.vertex(Vec3fs[1].getX(), Vec3fs[1].getY(), Vec3fs[1].getZ()).texture(maxU, minV).color(red, green, blue, alpha).light(l).next();
+            vertexConsumer.vertex(Vec3fs[2].getX(), Vec3fs[2].getY(), Vec3fs[2].getZ()).texture(minU, minV).color(red, green, blue, alpha).light(l).next();
+            vertexConsumer.vertex(Vec3fs[3].getX(), Vec3fs[3].getY(), Vec3fs[3].getZ()).texture(minU, maxV).color(red, green, blue, alpha).light(l).next();
         } else {
             this.markDead();
         }

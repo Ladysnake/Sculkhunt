@@ -105,8 +105,8 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         if (SculkhuntComponents.SCULK.get(this).isSculk() && this.age % 20 == 0) {
             int amountOfPlayersAround = (int) world.getPlayers(PLAYERS_IN_RANGE_PREDICATE, this, this.getBoundingBox().expand(16.0D, 16.0D, 16.0D)).stream().filter(playerEntity -> !SculkhuntComponents.SCULK.get(playerEntity).isSculk()).count();
             // always have at least 4 damage points
-            float baseDamage = 4f;
-            this.getAttributes().getCustomInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE).setBaseValue(baseDamage + 2f * Math.max(0, amountOfPlayersAround - 1));
+//            float baseDamage = 4f;
+//            this.getAttributes().getCustomInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE).setBaseValue(baseDamage + 2f * Math.max(0, amountOfPlayersAround - 1));
 
             // give dolphin grace
             if (this.isSwimming()) {

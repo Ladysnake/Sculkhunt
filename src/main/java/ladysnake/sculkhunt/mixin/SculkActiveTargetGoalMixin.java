@@ -3,7 +3,7 @@ package ladysnake.sculkhunt.mixin;
 import ladysnake.sculkhunt.cca.SculkhuntComponents;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.TargetPredicate;
-import net.minecraft.entity.ai.goal.FollowTargetGoal;
+import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.ai.goal.TrackTargetGoal;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -16,8 +16,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(FollowTargetGoal.class)
-public abstract class SculkFollowTargetGoalMixin<T extends LivingEntity> extends TrackTargetGoal {
+@Mixin(ActiveTargetGoal.class)
+public abstract class SculkActiveTargetGoalMixin<T extends LivingEntity> extends TrackTargetGoal {
     @Shadow
     @Final
     protected Class<T> targetClass;
@@ -28,7 +28,7 @@ public abstract class SculkFollowTargetGoalMixin<T extends LivingEntity> extends
     @Shadow
     protected TargetPredicate targetPredicate;
 
-    public SculkFollowTargetGoalMixin(MobEntity mob, boolean checkVisibility) {
+    public SculkActiveTargetGoalMixin(MobEntity mob, boolean checkVisibility) {
         super(mob, checkVisibility);
     }
 

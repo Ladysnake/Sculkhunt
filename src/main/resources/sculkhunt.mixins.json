@@ -23,7 +23,7 @@
     "LivingEntitySoundAccessor",
     "MobEntitySoundAccessor",
     "PlayerEntityMixin",
-    "SculkFollowTargetGoalMixin",
+    "SculkActiveTargetGoalMixin",
     "SculkSensorBlockDetectionMixin",
     "SculkSensorListenerMixin",
     "ServerPlayerEntityMixin",

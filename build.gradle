@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '0.9-SNAPSHOT'
+    id 'fabric-loom' version '0.10-SNAPSHOT'
     id 'maven-publish'
     id 'com.matthewprenger.cursegradle' version '1.4.0'
     id 'org.ajoberstar.grgit' version '3.1.1'
@@ -8,8 +8,8 @@ plugins {
 loom {
     accessWidenerPath = file("src/main/resources/sculkhunt.accesswidener")
 }
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_16
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 // Adds a few utility methods like getProjectProperty
 apply from: 'https://raw.githubusercontent.com/NerdHubMC/Gradle-Scripts/master/scripts/utilities.gradle'
@@ -48,8 +48,8 @@ dependencies {
     include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:3.1.1"
 
     // SATIN
-    modImplementation "io.github.ladysnake:satin:1.6.4"
-    include "io.github.ladysnake:satin:1.6.4"
+    modImplementation "io.github.ladysnake:satin:1.+"
+    include "io.github.ladysnake:satin:1.+"
 }
 
 processResources {

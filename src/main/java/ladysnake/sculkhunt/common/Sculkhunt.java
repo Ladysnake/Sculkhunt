@@ -49,6 +49,7 @@ public class Sculkhunt implements ModInitializer {
 
     public static List<UUID> playersToBeSculk = new ArrayList<>();
     public static ArrayList<UUID> playersToTurnToSculk = new ArrayList<>();
+    public static ArrayList<UUID> playersWhoEscaped = new ArrayList<>();
 
     public static int targetTimer;
 
@@ -92,23 +93,28 @@ public class Sculkhunt implements ModInitializer {
             }
 
             if (SculkhuntComponents.SCULK.get(newPlayer).isSculk()) {
-                float sculkPercentage = getSculkPlayerPercentage(newPlayer.getServerWorld());
+                float sculkPercentage = getSculkPlayerPercentage(newPlayer.getWorld());
                 float sculkMaxHealth = 12f;
+                float sculkDamage = 6f;
                 if (sculkPercentage >= 0.8f) {
                     sculkMaxHealth = 4f;
+                    sculkDamage = 2f;
                 } else if (sculkPercentage >= 0.6f) {
                     sculkMaxHealth = 6f;
+                    sculkDamage = 3f;
                 } else if (sculkPercentage >= 0.4f) {
                     sculkMaxHealth = 8f;
+                    sculkDamage = 4f;
                 } else if (sculkPercentage >= 0.2f) {
                     sculkMaxHealth = 10f;
+                    sculkDamage = 5f;
                 }
 
                 newPlayer.getAttributes().getCustomInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(sculkMaxHealth);
+                newPlayer.getAttributes().getCustomInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE).setBaseValue(sculkDamage);
                 newPlayer.setHealth(newPlayer.getMaxHealth());
                 newPlayer.getAttributes().getCustomInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(0.12f);
-                newPlayer.getAttributes().getCustomInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE).setBaseValue(4f);
-                newPlayer.giveItemStack(new ItemStack(SculkhuntBlocks.SCULK, 1 + newPlayer.getRandom().nextInt(3)));
+                newPlayer.giveItemStack(new ItemStack(SculkhuntBlocks.SCULK, 1 + newPlayer.getRandom().nextInt(5)));
 
                 // respawn in sculk
                 ServerWorld world = ((ServerWorld) newPlayer.world);
