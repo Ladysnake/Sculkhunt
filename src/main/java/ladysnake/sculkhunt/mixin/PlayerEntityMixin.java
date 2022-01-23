@@ -127,12 +127,15 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         if (SculkhuntComponents.SCULK.get(this).isSculk() && SculkhuntComponents.SCULK.get(player).isSculk()) {
             callbackInfoReturnable.setReturnValue(false);
         }
+        if (SculkhuntComponents.SCULK.get(this).isSculk() && !SculkhuntComponents.SCULK.get(player).isSculk() && ) {
+            callbackInfoReturnable.setReturnValue(false);
+        }
     }
 
     @Inject(method = "collideWithEntity", at = @At("TAIL"), cancellable = true)
     public void collideWithEntity(Entity entity, CallbackInfo callbackInfo) {
         if (!SculkhuntComponents.SCULK.get(this).isSculk() && entity instanceof PlayerEntity && !SculkhuntComponents.SCULK.get(entity).isSculk()) {
-            SculkhuntComponents.SCULK.get(this).setDetectedTime(20);
+            SculkhuntComponents.SCULK.get(this).setDetectedTime(40);
         }
     }
 }
