@@ -32,8 +32,10 @@ public class EndPortalBlockMixin {
                 if (!Sculkhunt.playersWhoEscaped.contains(entity.getUuid())) {
                     for (ServerPlayerEntity player : ((ServerWorld) world).getPlayers()) {
                         player.sendMessage(new LiteralText(entity.getEntityName() + " made it out!").setStyle(Style.EMPTY.withColor(Formatting.AQUA)), false);
-                        player.networkHandler.sendPacket(new PlaySoundS2CPacket(SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.MASTER, player.getX(), player.getY(), player.getZ(), 1.0F, 1.5F));
+                        player.networkHandler.sendPacket(new PlaySoundS2CPacket(SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.MASTER, player.getX(), player.getY(), player.getZ(), 1.0F, 0.5F));
                     }
+
+                    Sculkhunt.playersWhoEscaped.add(entity.getUuid());
                 }
             }
 

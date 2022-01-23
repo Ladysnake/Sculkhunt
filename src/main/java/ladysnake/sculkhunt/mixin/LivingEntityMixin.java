@@ -2,6 +2,7 @@ package ladysnake.sculkhunt.mixin;
 
 import com.google.common.collect.ImmutableList;
 import ladysnake.sculkhunt.cca.SculkhuntComponents;
+import ladysnake.sculkhunt.common.Sculkhunt;
 import ladysnake.sculkhunt.common.init.SculkhuntBlocks;
 import ladysnake.sculkhunt.common.init.SculkhuntDamageSources;
 import ladysnake.sculkhunt.common.init.SculkhuntDrops;
@@ -13,6 +14,7 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
@@ -71,6 +73,8 @@ public abstract class LivingEntityMixin extends Entity {
                 SculkhuntComponents.SCULK.get(sculkedEntity).setSculk(true);
                 sculkedEntity.world.spawnEntity(sculkedEntity);
             }
+        } else {
+            ((ServerWorld) world).spawnParticles(Sculkhunt.SOUND, this.getX(), this.getY() + this.getHeight() / 2, this.getZ(), 1, 0, 0, 0, 0);
         }
     }
 
@@ -147,8 +151,14 @@ public abstract class LivingEntityMixin extends Entity {
 
     @Inject(method = "damage", at = @At("TAIL"))
     public void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> callbackInfoReturnable) {
-        if (source.equals(DamageSource.ON_FIRE)) {
-            this.timeUntilRegen = 10;
+        if (!world.isClient) {
+            if (source.equals(DamageSource.ON_FIRE) && SculkhuntComponents.SCULK.get(this).isSculk()) {
+                this.timeUntilRegen = 10;
+            }
+
+            if (source != SculkhuntDamageSources.SCULK) {
+                ((ServerWorld) world).spawnParticles(Sculkhunt.SOUND, this.getX(), this.getY() + this.getHeight() / 2, this.getZ(), 1, 0, 0, 0, 0);
+            }
         }
     }
 }
