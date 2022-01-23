@@ -3,7 +3,10 @@ package ladysnake.sculkhunt.mixin;
 import ladysnake.sculkhunt.cca.SculkhuntComponents;
 import ladysnake.sculkhunt.common.Sculkhunt;
 import ladysnake.sculkhunt.common.init.SculkhuntBlocks;
+import ladysnake.sculkhunt.mixin.client.EntityRenderDispatcherMixin;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.render.entity.EntityRenderDispatcher;
+import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -135,7 +138,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
             callbackInfoReturnable.setReturnValue(false);
         }
 
-        if (SculkhuntComponents.SCULK.get(this).isSculk() && !SculkhuntComponents.SCULK.get(player).isSculk() && !this.canSee(player)) {
+        if (SculkhuntComponents.SCULK.get(this).isSculk() && !SculkhuntComponents.SCULK.get(player).isSculk()) {
             callbackInfoReturnable.setReturnValue(false);
         }
     }

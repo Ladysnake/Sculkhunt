@@ -162,8 +162,13 @@ public class Sculkhunt implements ModInitializer {
                 for (ServerWorld world : server.getWorlds()) {
                     if (world.getTime() % 20 == 0) {
                         for (ServerPlayerEntity player : world.getPlayers()) {
-                            Text message = new LiteralText("Sculk Trackers: " + world.getPlayers().stream().filter(serverPlayerEntity -> SculkhuntComponents.SCULK.get(serverPlayerEntity).isSculk()).count() + " | Survivors: " + world.getPlayers().stream().filter(serverPlayerEntity -> !SculkhuntComponents.SCULK.get(serverPlayerEntity).isSculk() && !serverPlayerEntity.isCreative() && !serverPlayerEntity.isSpectator()).count());
-                            player.sendMessage(message, true);
+                            if (SculkhuntComponents.SCULK.get(player).isDetected()) {
+                                Text message = new LiteralText("DETECTED! Visible to the sculk for "+SculkhuntComponents.SCULK.get(player).detectedTime() / 20 + "s").setStyle(Style.EMPTY.withColor(Formatting.RED));
+                                player.sendMessage(message, true);
+                            } else {
+                                Text message = new LiteralText("Sculk Trackers: " + world.getPlayers().stream().filter(serverPlayerEntity -> SculkhuntComponents.SCULK.get(serverPlayerEntity).isSculk()).count() + " | Survivors: " + world.getPlayers().stream().filter(serverPlayerEntity -> !SculkhuntComponents.SCULK.get(serverPlayerEntity).isSculk() && !serverPlayerEntity.isCreative() && !serverPlayerEntity.isSpectator()).count());
+                                player.sendMessage(message, true);
+                            }
                         }
                     }
                 }
