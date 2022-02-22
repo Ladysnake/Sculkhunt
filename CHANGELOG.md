@@ -1,9 +1,15 @@
 # Sculkhunt - Changelog:
 
-### Sculkhunt 1.1.1 - 1.18.1
+### Sculkhunt 1.2 - 1.18.1
 - Updated to Minecraft 1.18.1
-- Removed the damage ramping up the more players a sculk tracker is near
+- Removed the damage ramping up the more survivor players a sculk tracker is near
 - Damage now scales down the more sculk trackers there are
+- Fixed player win messages being sent multiple times
+- Entities now emit vibrations when damaged
+- Removed sculk trackers revealing players upon hitting them
+- Sculk trackers colliding with a players will now reveal them for 2 seconds
+- Added a hotbar message for survivors to indicate whenever they are detected and for how long
+- Sculk trackers can no longer respawn withing 15 blocks of survivor players
 
 ### Sculkhunt 1.1 - 1.17.1
 - Ringing bells now causes random reverberation vibrations in a 30 block radius, allowing you to hide your vibrations to sculk players

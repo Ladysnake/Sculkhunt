@@ -137,10 +137,6 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         if (SculkhuntComponents.SCULK.get(this).isSculk() && SculkhuntComponents.SCULK.get(player).isSculk()) {
             callbackInfoReturnable.setReturnValue(false);
         }
-
-        if (SculkhuntComponents.SCULK.get(this).isSculk() && !SculkhuntComponents.SCULK.get(player).isSculk()) {
-            callbackInfoReturnable.setReturnValue(false);
-        }
     }
 
     @Inject(method = "collideWithEntity", at = @At("TAIL"), cancellable = true)
